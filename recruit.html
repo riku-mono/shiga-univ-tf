@@ -1,182 +1,225 @@
 <!DOCTYPE html>
 <html lang="ja">
+
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>新入生向けの情報｜滋賀大学陸上競技部</title>
-  <meta name="description" content="滋賀大学陸上競技部の新入生向け案内ページです。練習時間（彦根・大津）、体験練習会などの日時、主将・監督（コーチ）挨拶を掲載しています。" />
+  <meta name="description"
+    content="滋賀大学陸上競技部の新入生向け案内ページです。彦根キャンパス・大津キャンパスの練習時間・場所、練習見学・体験練習、主将・監督からのメッセージを掲載しています。" />
   <link rel="stylesheet" href="style.css" />
 </head>
+
 <body>
+  <div class="page-wrapper" data-node-id="19:42">
 
-  <!-- ==================== ヘッダー ==================== -->
-  <header class="site-header">
-    <div class="container header-inner">
-      <a href="index.html" class="site-logo">
-        <span class="site-logo-sub">SHIGA UNIVERSITY TRACK &amp; FIELD</span>
-        <span class="site-logo-main">滋賀大学陸上競技部</span>
-      </a>
-      <button id="menu-toggle" class="menu-toggle" aria-label="メニューを開く">メニュー ☰</button>
-      <nav id="main-nav" class="main-nav">
-        <ul>
-          <li><a href="index.html">ホーム</a></li>
-          <li><a href="index.html#news">お知らせ</a></li>
-          <li><a href="records.html">滋賀大記録</a></li>
-          <li><a href="recruit.html" class="active">新入生の方へ</a></li>
-          <li><a href="members.html">部員紹介</a></li>
-          <li><a href="index.html#faq">よくある質問</a></li>
-          <li><a href="index.html#contact">お問い合わせ</a></li>
-        </ul>
-      </nav>
-    </div>
-  </header>
+    <!-- ==================== Header (19:43 PC / 19:65 SP) ==================== -->
+    <header class="site-header" data-node-id="19:43">
+      <div class="header-inner">
+        <a href="index.html" class="home-link" data-node-id="19:44">
+          <span class="home-link-jp" data-node-id="19:45">滋賀大学陸上競技部</span>
+          <span class="home-link-en" data-node-id="19:46">SHIGA UNIVERSITY TRACK &amp; FIELD</span>
+        </a>
 
-  <main>
-    <!-- ページ見出し -->
-    <div class="subpage-header">
-      <div class="container">
-        <h1>新入生向けの情報</h1>
-        <p>練習時間（彦根・大津）・体験練習会の日時・主将および監督（コーチ）挨拶</p>
+        <!-- スマホ用メニューボタン (19:69) -->
+        <button type="button" id="menu-btn" class="menu-btn" aria-expanded="false" aria-label="メニューを開閉">
+          <span class="menu-btn-icon" id="menu-btn-icon">☰</span>
+          <span class="menu-btn-label">MENU</span>
+        </button>
+
+        <!-- ナビゲーション (19:47) -->
+        <nav id="header-nav" class="header-nav" data-node-id="19:47">
+          <a href="index.html" data-node-id="19:48">ホーム</a>
+          <a href="#practice" data-node-id="19:49">活動時間・場所</a>
+          <a href="recruit.html" data-node-id="19:50">入部希望の方へ</a>
+          <a href="members.html" data-node-id="19:51">部員一覧</a>
+          <a href="index.html#faq" data-node-id="19:52">よくある質問</a>
+          <a href="index.html#contact" data-node-id="19:53">お問い合わせ</a>
+        </nav>
       </div>
-    </div>
-    <div class="breadcrumb">
-      <div class="container">
-        <a href="index.html">ホーム</a> &gt; 新入生向けの情報
-      </div>
-    </div>
+    </header>
 
-    <!-- ==================== 1. 練習時間・練習場所（彦根・大津） ==================== -->
-    <section class="section">
-      <div class="container">
-        <div class="section-header">
-          <h2 class="section-title">練習時間・場所（彦根・大津）</h2>
-          <p class="section-desc">彦根キャンパス・大津キャンパスの2拠点で活動し、土曜日などは合同で競技場練習を行っています。</p>
+    <main>
+      <!-- ==================== Intro (19:54 PC / 19:72 SP) ==================== -->
+      <section class="subpage-section subpage-section--pale" data-node-id="19:54">
+        <p class="breadcrumb-line" data-node-id="19:330"><a href="index.html">ホーム</a>  /  新入生向けの情報</p>
+        <p class="section-eyebrow" data-node-id="19:331">FOR NEW MEMBERS</p>
+
+        <h1 class="subpage-heading subpage-heading--recruit" data-node-id="19:332">
+          <p>大学生活に、</p>
+          <p>本気になれる時間を。</p>
+        </h1>
+
+        <div class="subpage-lead" data-node-id="19:333">
+          <p>新入生・入部を考えている皆さんへ。</p>
+          <p>経験や学年を問わず、あなたの挑戦を歓迎します。</p>
         </div>
 
-        <div class="campus-grid">
-          <!-- 彦根キャンパス -->
-          <div class="info-card">
-            <h3>彦根キャンパス（経済学部・データサイエンス学部）</h3>
-            <table class="info-table">
-              <tbody>
-                <tr>
-                  <th>平日練習</th>
-                  <td>14:40〜（授業時間の4・5限を中心に活動）</td>
-                </tr>
-                <tr>
-                  <th>土曜・祝日</th>
-                  <td>9:30〜（全体練習・競技場練習）</td>
-                </tr>
-                <tr>
-                  <th>OFF（休日）</th>
-                  <td>木曜日・日曜日</td>
-                </tr>
-                <tr>
-                  <th>練習場所</th>
-                  <td>彦根キャンパス新グラウンド、平和堂HATOスタジアム、げんきっこフィールド</td>
-                </tr>
-              </tbody>
-            </table>
+        <div class="recruit-hero-img-wrap" data-node-id="19:334">
+          <picture>
+            <source media="(max-width: 768px)" srcset="assets/recruit-intro-sp.png" />
+            <img src="assets/recruit-intro-pc.png" alt="仲間と過ごす練習時間（イメージ）" />
+          </picture>
+        </div>
+
+        <p class="recruit-anchor-nav" data-node-id="19:335">
+          <a href="#practice">練習時間・場所</a>   /   <a href="#events">見学・練習会</a>   /   <a href="#greetings">主将・監督挨拶</a>
+        </p>
+      </section>
+
+      <!-- ==================== Practice (19:55 PC / 19:73 SP) ==================== -->
+      <section id="practice" class="subpage-section subpage-section--white" data-node-id="19:55">
+        <p class="section-eyebrow" data-node-id="19:336">PRACTICE</p>
+        <h2 class="subpage-sec-title" data-node-id="19:337">2つのキャンパスで、ひとつのチーム。</h2>
+
+        <div class="campus-cards-grid" data-node-id="19:338">
+          <!-- 彦根キャンパス (19:339) -->
+          <div class="campus-card" data-node-id="19:339">
+            <p class="campus-card-en" data-node-id="19:340">HIKONE</p>
+            <h3 class="campus-card-title" data-node-id="19:341">彦根キャンパス</h3>
+
+            <div class="campus-info-item" data-node-id="19:342">
+              <p class="campus-info-label" data-node-id="19:343">平日</p>
+              <p class="campus-info-value" data-node-id="19:344">14:40〜（4限）</p>
+            </div>
+
+            <div class="campus-info-item" data-node-id="19:345">
+              <p class="campus-info-label" data-node-id="19:346">土曜・祝日</p>
+              <p class="campus-info-value" data-node-id="19:347">9:30〜</p>
+            </div>
+
+            <div class="campus-info-item" data-node-id="19:348">
+              <p class="campus-info-label" data-node-id="19:349">木曜・日曜</p>
+              <p class="campus-info-value" data-node-id="19:350">OFF</p>
+            </div>
+
+            <a href="https://www.instagram.com/shiga_athletics/" target="_blank" rel="noopener noreferrer"
+              class="blue-bar-btn" data-node-id="19:351">
+              <span class="blue-bar-btn-text" data-node-id="19:352">キャンパスのInstagram  ↗</span>
+              <span class="blue-bar-btn-arrow" data-node-id="19:353">→</span>
+            </a>
           </div>
 
-          <!-- 大津キャンパス -->
-          <div class="info-card">
-            <h3>大津キャンパス（教育学部）</h3>
-            <table class="info-table">
-              <tbody>
-                <tr>
-                  <th>平日練習</th>
-                  <td>放課後（授業スケジュールに合わせて活動）<br /><small style="color: #4a5568;">※詳細は大津キャンパスInstagramにて随時案内しています</small></td>
-                </tr>
-                <tr>
-                  <th>土曜・祝日</th>
-                  <td>競技場での練習・彦根キャンパスとの合同練習</td>
-                </tr>
-                <tr>
-                  <th>OFF（休日）</th>
-                  <td>週2〜3日（授業・実習スケジュールに応じて調整）</td>
-                </tr>
-                <tr>
-                  <th>練習場所</th>
-                  <td>教育キャンパスグラウンド、皇子山陸上競技場、平和堂HATOスタジアム</td>
-                </tr>
-              </tbody>
-            </table>
+          <!-- 大津キャンパス (19:354) -->
+          <div class="campus-card" data-node-id="19:354">
+            <p class="campus-card-en" data-node-id="19:355">OTSU</p>
+            <h3 class="campus-card-title" data-node-id="19:356">大津キャンパス</h3>
+
+            <div class="campus-info-item" data-node-id="19:357">
+              <p class="campus-info-label" data-node-id="19:358">練習時間</p>
+              <p class="campus-info-value" data-node-id="19:359">最新の時間はお問い合わせください</p>
+            </div>
+
+            <div class="campus-info-item" data-node-id="19:360">
+              <p class="campus-info-label" data-node-id="19:361">主な練習場所</p>
+              <p class="campus-info-value" data-node-id="19:362">教育キャンパスグランドなど</p>
+            </div>
+
+            <div class="campus-info-item" data-node-id="19:363">
+              <p class="campus-info-label" data-node-id="19:364">ご相談</p>
+              <p class="campus-info-value" data-node-id="19:365">InstagramのDMへ</p>
+            </div>
+
+            <a href="https://www.instagram.com/shiga.edu_rikujo/" target="_blank" rel="noopener noreferrer"
+              class="blue-bar-btn" data-node-id="19:366">
+              <span class="blue-bar-btn-text" data-node-id="19:367">キャンパスのInstagram  ↗</span>
+              <span class="blue-bar-btn-arrow" data-node-id="19:368">→</span>
+            </a>
           </div>
         </div>
-      </div>
-    </section>
 
-    <!-- ==================== 2. 練習会・新歓イベントなどの日時 ==================== -->
-    <section class="section">
-      <div class="container">
-        <div class="section-header">
-          <h2 class="section-title">練習会・体験会などの日時</h2>
-          <p class="section-desc">未経験の方・2回生以上の方・マネージャー希望の方もいつでも見学・体験大歓迎です！</p>
-        </div>
+        <p class="practice-places-heading" data-node-id="19:369">主な練習場所</p>
+        <p class="practice-places-list" data-node-id="19:370">
+          彦根キャンパス新グランド ／ 教育キャンパスグランド ／ HATOスタジアム ／ げんきっこフィールド ／ 皇子山陸上競技場
+        </p>
+        <p class="subpage-footnote" data-node-id="19:371">
+          ※ 既存サイトの掲載情報をもとにしています。活動時間・集合場所は見学前にご確認ください。
+        </p>
+      </section>
 
-        <div id="recruit-events-list" class="events-list">
-          <!-- app.js が data.js の recruitEvents から自動生成します -->
-        </div>
-      </div>
-    </section>
+      <!-- ==================== Events (19:56 PC / 19:74 SP) ==================== -->
+      <section id="events" class="subpage-section subpage-section--pale" data-node-id="19:56">
+        <p class="section-eyebrow" data-node-id="19:372">COME &amp; JOIN US</p>
+        <h2 class="subpage-sec-title" data-node-id="19:373">まずは、練習を見に来ませんか。</h2>
 
-    <!-- ==================== 3. 主将・監督（コーチ）挨拶 ==================== -->
-    <section class="section">
-      <div class="container">
-        <div class="section-header">
-          <h2 class="section-title">主将・監督（コーチ）挨拶</h2>
-        </div>
-
-        <div class="greeting-stack">
-          <div class="greeting-box">
-            <h3>総合主将挨拶</h3>
-            <p>
-              新入生の皆さん、ご入学おめでとうございます。経済学部3回生で総合主将を務めています田中亜周です。<br />
-              滋賀大学陸上競技部は彦根キャンパスと大津キャンパスを合わせて約70名の部員で活動しています。
-            </p>
-            <p>
-              短距離、長距離、投擲の3つのパートに分かれ、専門種目に合わせた練習を行っています。授業日は4・5限を中心に、土曜日は全員で練習を行うことで、チーム内で競争意識をもち、切磋琢磨しながら練習に取り組んでいます。また定期的にHATOスタジアムなど競技場での練習を行っており、さらなる競技力向上を目指しています。
-            </p>
-            <p>
-              自己ベストの更新、インカレでの入賞、滋賀大記録の更新など個人が持つ目標は様々ですが、近年ではチームとしての陸上競技であるリレーにも力を入れることでより一層活発なチームになってきています。<br />
-              Instagram、Xで試合結果、練習風景を発信しています。ぜひチェックしてみてください！
-            </p>
-            <div class="greeting-sign">滋賀大学陸上競技部 総合主将　田中 亜周</div>
+        <div class="events-white-card" data-node-id="19:374">
+          <h3 class="events-card-title" data-node-id="19:375">練習見学・体験練習</h3>
+          <div class="events-card-body" data-node-id="19:376">
+            <p>日程：各キャンパスへご相談ください</p>
+            <p>練習会の日時：確定後、このページでお知らせします。</p>
+            <p>集合場所・持ち物：参加前にご案内します。</p>
           </div>
 
-          <div class="greeting-box">
-            <h3>監督（コーチ）挨拶</h3>
-            <p>
-              こんにちは。2022年4月から滋賀大学陸上競技部監督に就任した図子浩太佑（ずしこうだゆう）です。同年3月に筑波大学コーチング学専攻を修了し、滋賀大学経済学部に着任しました。
+          <a href="https://www.instagram.com/shiga_athletics/" target="_blank" rel="noopener noreferrer"
+            class="blue-bar-btn" data-node-id="19:377">
+            <span class="blue-bar-btn-text" data-node-id="19:378">Instagramで見学を相談する  ↗</span>
+            <span class="blue-bar-btn-arrow" data-node-id="19:379">→</span>
+          </a>
+        </div>
+      </section>
+
+      <!-- ==================== Greetings (19:57 PC / 19:75 SP) ==================== -->
+      <section id="greetings" class="subpage-section subpage-section--white" data-node-id="19:57">
+        <p class="section-eyebrow" data-node-id="19:380">MESSAGE</p>
+        <h2 class="subpage-sec-title" data-node-id="19:381">主将・監督からのメッセージ</h2>
+
+        <div class="greetings-grid" data-node-id="19:382">
+          <!-- 総合主将挨拶 (19:383) -->
+          <div class="greeting-card" data-node-id="19:383">
+            <p class="greeting-role" data-node-id="19:384">総合主将  /  田中 亜周</p>
+            <h3 class="greeting-title" data-node-id="19:385">目標はそれぞれ。挑戦は、ともに。</h3>
+            <p class="greeting-body" data-node-id="19:386">
+              短距離、長距離、投擲の3つのパートに分かれ、専門種目に合わせた練習を行っています。自己ベストの更新やインカレでの入賞など、それぞれの目標に向かって取り組んでいます。
             </p>
-            <p>
-              入部を考えている方へ。大学での競技活動を通して、自己開発スキルを養ってほしいと私は考えています。PDCA（Plan-do-check-action）サイクルやOODA（Observe-Orient-Decide-Act）サイクルといわれるような意思決定と行動プロセスは、トレーニングにおいても重要となります。メンタル面においても、プレッシャーや不安のコントロールや注意の集中、リラクセーションといった心理的スキルは日々のトレーニングやここ一番の競技会で高い成果を出すために重要になります。このようにパフォーマンス向上にむけて試行錯誤すること、自分と向き合い心身を整えながら継続的に活動していく営みは、社会で幸せに力強く生きるために役立つスキルであると認識しています。そして、陸上競技という個人競技だからこそ、自分自身の日々の取り組みと真剣に向き合うことができるのではないでしょうか。一朝一夕に手に入るものではありませんが挑戦してみる価値はあると思います。
+          </div>
+
+          <!-- 監督挨拶 (19:387) -->
+          <div class="greeting-card" data-node-id="19:387">
+            <p class="greeting-role" data-node-id="19:388">監督  /  図子 浩太佑</p>
+            <h3 class="greeting-title" data-node-id="19:389">陸上を通して、自分と向き合う。</h3>
+            <p class="greeting-body" data-node-id="19:390">
+              様々な種目、競技レベルの部員が所属し、様々な立場や価値観の部員が共存しています。陸上競技に少しでも興味があれば、ぜひ足を運んでください。
             </p>
-            <p>
-              最後に、これまで小難しいことを言いましたが、滋賀大陸上競技部には様々な種目、競技レベルの部員が所属し、様々な立場や価値観の部員が共存しながら一つの組織を運営してきたので、様々なバックグラウンドの人を受け入れることができる環境はできています。陸上競技に少しでも興味があればぜひ足を運んでください。
-            </p>
-            <div class="greeting-sign">滋賀大学陸上競技部 監督　図子 浩太佑</div>
           </div>
         </div>
-      </div>
-    </section>
-  </main>
 
-  <!-- ==================== フッター（コピーライト） ==================== -->
-  <footer class="site-footer">
-    <div class="container">
-      <p>&copy; Shiga University Track and Field Club. All Rights Reserved.</p>
-    </div>
-  </footer>
+        <p class="subpage-footnote" data-node-id="19:391">
+          ※ 既存サイトに掲載された挨拶の要約です。役職・氏名・本文は公開前に最新情報をご確認ください。写真はイメージです。
+        </p>
+      </section>
+
+      <!-- ==================== Join CTA (19:58 PC / 19:76 SP) ==================== -->
+      <section class="subpage-section subpage-section--blue" data-node-id="19:58">
+        <p class="blue-sec-eyebrow" data-node-id="19:392">YOUR NEXT START</p>
+        <h2 class="blue-sec-heading" data-node-id="19:393">次は、あなたの番。</h2>
+        <p class="blue-sec-desc" data-node-id="19:394">気になることは、見学前でもお気軽に。</p>
+
+        <a href="index.html#contact" class="white-bar-btn" data-node-id="19:395">
+          <span class="white-bar-btn-text" data-node-id="19:396">お問い合わせへ</span>
+          <span class="white-bar-btn-arrow" data-node-id="19:397">→</span>
+        </a>
+      </section>
+    </main>
+
+    <!-- ==================== Footer (19:59 PC / 19:77 SP) ==================== -->
+    <footer class="site-footer" data-node-id="19:59">
+      <div class="footer-inner">
+        <p class="footer-title-jp" data-node-id="19:60">滋賀大学陸上競技部</p>
+        <p class="footer-title-en" data-node-id="19:61">SHIGA UNIVERSITY TRACK &amp; FIELD</p>
+        <p class="footer-campus" data-node-id="19:62">彦根キャンパス  /  大津キャンパス</p>
+        <p class="footer-copy" data-node-id="19:63">© SHIGA UNIVERSITY TRACK &amp; FIELD CLUB</p>
+      </div>
+    </footer>
+
+  </div>
 
   <!-- ==================== スマホ表示プレビュー確認ボタン ==================== -->
-  <button id="mobile-preview-btn" class="mobile-preview-fab" title="スマホでの見え方を確認します">
+  <button id="mobile-preview-btn" class="mobile-preview-fab" title="スマホ版（390px幅）での見え方を確認します">
     📱 スマホ表示で見る
   </button>
   <div id="mobile-preview-modal" class="mobile-preview-modal" aria-hidden="true">
     <div class="mobile-preview-toolbar">
-      <span>📱 スマホ版プレビュー</span>
+      <span>📱 スマホ版プレビュー（390px幅）</span>
       <button id="mobile-preview-close" class="mobile-preview-close">✕ PC表示に戻る</button>
     </div>
     <div class="mobile-device-frame">
@@ -187,5 +230,5 @@
   <script src="data.js"></script>
   <script src="app.js"></script>
 </body>
-</html>
 
+</html>

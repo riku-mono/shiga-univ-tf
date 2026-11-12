@@ -2,6 +2,12 @@
  * ============================================================================
  * 滋賀大学陸上競技部 ウェブサイト 動作スクリプト (app.js)
  * ============================================================================
+ * 1. スマホ版 開閉式メニュー (Header)
+ * 2. トップページ：FAQの開閉
+ * 3. トップページ：お問い合わせ入力チェック・確認・完了／失敗表示（Yahoo!メール受信対応）
+ * 4. 部員紹介ページ：1〜4回生・大学院生（院生）の切り替え
+ * 5. 滋賀大記録ページ：カテゴリ切り替え ＆ 詳細から保持者・大会・達成日・会場の表示
+ * 6. スマホ表示プレビュー機能
  */
 
 document.addEventListener("DOMContentLoaded", () => {
@@ -80,7 +86,6 @@ document.addEventListener("DOMContentLoaded", () => {
   function validateForm() {
     let valid = true;
 
-    // お名前チェック
     if (!nameInput.value.trim()) {
       nameInput.classList.add("has-error");
       errName.classList.add("visible");
@@ -90,7 +95,6 @@ document.addEventListener("DOMContentLoaded", () => {
       errName.classList.remove("visible");
     }
 
-    // メールアドレスチェック
     const emailVal = emailInput.value.trim();
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailVal || !emailRegex.test(emailVal)) {
@@ -102,7 +106,6 @@ document.addEventListener("DOMContentLoaded", () => {
       errEmail.classList.remove("visible");
     }
 
-    // お問い合わせ内容チェック
     if (!messageInput.value.trim()) {
       messageInput.classList.add("has-error");
       errMessage.classList.add("visible");
@@ -112,7 +115,6 @@ document.addEventListener("DOMContentLoaded", () => {
       errMessage.classList.remove("visible");
     }
 
-    // 同意チェック
     if (!consentInput.checked) {
       errConsent.classList.add("visible");
       valid = false;
@@ -124,7 +126,6 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   if (contactForm && confirmView && resultView) {
-    // 入力時にリアルタイムでエラー表示を解除
     [nameInput, emailInput, messageInput].forEach((input) => {
       if (!input) return;
       input.addEventListener("input", () => {
@@ -132,7 +133,6 @@ document.addEventListener("DOMContentLoaded", () => {
       });
     });
 
-    // Step 1: 「入力内容を確認する」ボタン押下時
     contactForm.addEventListener("submit", (e) => {
       e.preventDefault();
       if (!validateForm()) return;
@@ -145,7 +145,6 @@ document.addEventListener("DOMContentLoaded", () => {
       confirmView.classList.add("active");
     });
 
-    // Step 2a: 「修正する」ボタン押下時
     if (btnBackEdit) {
       btnBackEdit.addEventListener("click", () => {
         confirmView.classList.remove("active");
@@ -153,7 +152,6 @@ document.addEventListener("DOMContentLoaded", () => {
       });
     }
 
-    // Step 2b: 「送信する」ボタン押下時（部のYahoo!メール受信用エンドポイントまたはメール送信）
     if (btnSendFinal) {
       btnSendFinal.addEventListener("click", async () => {
         const payload = {
@@ -167,7 +165,6 @@ document.addEventListener("DOMContentLoaded", () => {
 
         try {
           if (cfg.endpointUrl) {
-            // Formspree や Google Apps Script 経由で部のYahoo!メールへ自動送信
             const response = await fetch(cfg.endpointUrl, {
               method: "POST",
               headers: {
@@ -185,7 +182,6 @@ document.addEventListener("DOMContentLoaded", () => {
             resultBanner.innerHTML =
               "<strong>送信が完了しました。</strong><br>お問い合わせありがとうございます。内容を確認のうえ、担当者よりご連絡いたします。";
           } else if (cfg.yahooEmail) {
-            // メールクライアント経由で部のYahoo!メールへ送信
             const subject = encodeURIComponent(`【滋賀大学陸上競技部HP お問い合わせ】${payload.name}様`);
             const body = encodeURIComponent(
               `お名前: ${payload.name}\nメールアドレス: ${payload.email}\n\nお問い合わせ内容:\n${payload.message}`
@@ -196,7 +192,6 @@ document.addEventListener("DOMContentLoaded", () => {
             resultBanner.innerHTML =
               "<strong>メール作成画面を起動しました。</strong><br>メールソフトから送信を完了してください。";
           } else {
-            // 接続・宛先設定前の確認モード（完了表示の確認が可能）
             resultBanner.className = "status-banner status-banner--success";
             resultBanner.innerHTML =
               "<strong>【確認モード】送信完了表示テスト</strong><br>入力チェックおよび確認ステップが完了しました（※現在、送信先の部のYahoo!メールは接続・宛先設定前です。data.js の contactConfig で接続後に実送信されます）。";
@@ -213,7 +208,6 @@ document.addEventListener("DOMContentLoaded", () => {
       });
     }
 
-    // Step 3: 「新しいお問い合わせを入力する」ボタン押下時
     if (btnResetForm) {
       btnResetForm.addEventListener("click", () => {
         contactForm.reset();
@@ -224,7 +218,212 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   // --------------------------------------------------------------------------
-  // 4. スマホ表示プレビュー機能
+  // 4. 部員紹介ページ：1〜4回生・大学院生（院生）で切り替える (19:82 PC / 19:102 SP)
+  // --------------------------------------------------------------------------
+  const gradeTabs = document.querySelectorAll("[data-grade-tab]");
+  const membersGradeHeading = document.getElementById("members-grade-heading");
+  const membersCardsGrid = document.getElementById("members-cards-grid");
+
+  function renderMembersForGrade(gradeKey) {
+    if (!membersCardsGrid || typeof SITE_DATA === "undefined" || !SITE_DATA.membersByGrade) return;
+
+    const list = SITE_DATA.membersByGrade[gradeKey] || [];
+    if (membersGradeHeading) {
+      membersGradeHeading.textContent = gradeKey === "院生" ? "大学院生（院生）" : gradeKey;
+    }
+
+    membersCardsGrid.innerHTML = list
+      .map(
+        (m) => `
+        <article class="member-card">
+          <div class="member-card-top">
+            <p class="member-event-tag">${m.eventTag}</p>
+            <p class="member-num">${m.num}</p>
+          </div>
+          <p class="member-kana">${m.kana}</p>
+          <h3 class="member-name">${m.name}</h3>
+          <p class="member-faculty">${m.facultyGrade}</p>
+          <div class="member-details">
+            <p>出身高校   ${m.highSchool}</p>
+            <p>専門種目   ${m.specialty}</p>
+          </div>
+          <div class="member-pb-box">
+            <p class="member-pb-label">PERSONAL BEST</p>
+            <p class="member-pb-value">${m.pb}</p>
+          </div>
+          <p class="member-comment">${m.comment}</p>
+        </article>
+      `
+      )
+      .join("");
+  }
+
+  if (gradeTabs.length > 0 && membersCardsGrid) {
+    gradeTabs.forEach((tab) => {
+      tab.addEventListener("click", () => {
+        const gradeKey = tab.getAttribute("data-grade-tab") || "1回生";
+
+        gradeTabs.forEach((t) => {
+          const active = t === tab;
+          t.classList.toggle("is-active", active);
+          t.setAttribute("aria-selected", String(active));
+        });
+
+        renderMembersForGrade(gradeKey);
+      });
+    });
+  }
+
+  // --------------------------------------------------------------------------
+  // 5. 滋賀大記録ページ：カテゴリ別切り替え ＆ 詳細表示 (19:118 PC / 19:138 SP)
+  // --------------------------------------------------------------------------
+  const recordCatTabs = document.querySelectorAll("[data-record-cat]");
+  const recordsCatHeading = document.getElementById("records-cat-heading");
+  const recordsMenList = document.getElementById("records-men-list");
+  const recordsWomenList = document.getElementById("records-women-list");
+
+  const recordDetailSection = document.getElementById("record-detail-section");
+  const recordDetailCard = document.getElementById("record-detail-card");
+  const detailEventTitle = document.getElementById("detail-event-title");
+  const detailRecordValue = document.getElementById("detail-record-value");
+  const detailHolder = document.getElementById("detail-holder");
+  const detailDate = document.getElementById("detail-date");
+  const detailTournament = document.getElementById("detail-tournament");
+  const detailPlace = document.getElementById("detail-place");
+  const detailCloseBtn = document.getElementById("detail-close-btn");
+
+  let currentRecordCategory = "track";
+
+  function updateDetailCard(genderLabel, item) {
+    if (!item || !recordDetailCard) return;
+    recordDetailCard.style.display = "flex";
+    if (detailEventTitle) detailEventTitle.textContent = `${genderLabel} ${item.event}`;
+    if (detailRecordValue) detailRecordValue.textContent = item.record;
+    if (detailHolder) detailHolder.textContent = item.holder || "—";
+    if (detailDate) detailDate.textContent = item.date || "—";
+    if (detailTournament) detailTournament.textContent = item.tournament || "—";
+    if (detailPlace) detailPlace.textContent = item.place || "—";
+  }
+
+  function renderRecordList(container, items, genderLabel, selectFirstByDefault) {
+    if (!container) return;
+
+    if (!items || items.length === 0) {
+      container.innerHTML = `<p class="records-empty-msg">現在このカテゴリの${genderLabel}記録データは登録されていません。</p>`;
+      return;
+    }
+
+    container.innerHTML = items
+      .map((item, idx) => {
+        const isFirstSelected = selectFirstByDefault && idx === 0;
+        return `
+          <div class="record-item-wrap">
+            <button type="button" class="record-row-btn${isFirstSelected ? " is-selected" : ""}"
+              data-gender="${genderLabel}"
+              data-idx="${idx}"
+              aria-expanded="${isFirstSelected ? "true" : "false"}">
+              <span class="record-row-event">${item.event}</span>
+              <span class="record-row-val">${item.record}</span>
+              <span class="record-row-plus">${isFirstSelected ? "−" : "＋"}</span>
+            </button>
+            <div class="record-inline-detail${isFirstSelected ? " is-open" : ""}">
+              <div class="record-inline-line"><span>記録保持者</span><strong>${item.holder || "—"}</strong></div>
+              <div class="record-inline-line"><span>達成日</span><span>${item.date || "—"}</span></div>
+              <div class="record-inline-line"><span>大会</span><span>${item.tournament || "—"}</span></div>
+              <div class="record-inline-line"><span>会場</span><span>${item.place || "—"}</span></div>
+            </div>
+          </div>
+        `;
+      })
+      .join("");
+
+    // 各行クリックでインライン詳細を開閉し、下部の RECORD DETAIL カードも同時更新
+    container.querySelectorAll(".record-row-btn").forEach((btn) => {
+      btn.addEventListener("click", () => {
+        const idx = Number(btn.getAttribute("data-idx") || 0);
+        const item = items[idx];
+        const wrap = btn.closest(".record-item-wrap");
+        const inlineDetail = wrap ? wrap.querySelector(".record-inline-detail") : null;
+        const plusIcon = btn.querySelector(".record-row-plus");
+
+        const wasOpen = inlineDetail ? inlineDetail.classList.contains("is-open") : false;
+
+        // 他の行の選択状態をリセット
+        document.querySelectorAll(".record-row-btn").forEach((b) => {
+          b.classList.remove("is-selected");
+          b.setAttribute("aria-expanded", "false");
+          const p = b.querySelector(".record-row-plus");
+          if (p) p.textContent = "＋";
+        });
+        document.querySelectorAll(".record-inline-detail").forEach((d) => {
+          d.classList.remove("is-open");
+        });
+
+        if (!wasOpen) {
+          btn.classList.add("is-selected");
+          btn.setAttribute("aria-expanded", "true");
+          if (plusIcon) plusIcon.textContent = "−";
+          if (inlineDetail) inlineDetail.classList.add("is-open");
+          updateDetailCard(genderLabel, item);
+        }
+      });
+    });
+  }
+
+  function renderRecordsCategory(catKey) {
+    if (typeof SITE_DATA === "undefined" || !SITE_DATA.recordsByCategory) return;
+    const catData = SITE_DATA.recordsByCategory[catKey];
+    if (!catData) return;
+
+    currentRecordCategory = catKey;
+    if (recordsCatHeading) {
+      recordsCatHeading.textContent = catData.label;
+    }
+
+    renderRecordList(recordsMenList, catData.men, "男子", true);
+    renderRecordList(recordsWomenList, catData.women, "女子", false);
+
+    // 初期詳細カードを先頭の記録にセット
+    if (catData.men && catData.men.length > 0) {
+      updateDetailCard("男子", catData.men[0]);
+    } else if (catData.women && catData.women.length > 0) {
+      updateDetailCard("女子", catData.women[0]);
+    }
+  }
+
+  if ( recordsMenList && recordsWomenList ) {
+    renderRecordsCategory(currentRecordCategory);
+
+    recordCatTabs.forEach((tab) => {
+      tab.addEventListener("click", () => {
+        const catKey = tab.getAttribute("data-record-cat") || "track";
+        recordCatTabs.forEach((t) => {
+          const active = t === tab;
+          t.classList.toggle("is-active", active);
+          t.setAttribute("aria-selected", String(active));
+        });
+        renderRecordsCategory(catKey);
+      });
+    });
+
+    if (detailCloseBtn && recordDetailCard) {
+      detailCloseBtn.addEventListener("click", () => {
+        recordDetailCard.style.display = "none";
+        document.querySelectorAll(".record-row-btn").forEach((b) => {
+          b.classList.remove("is-selected");
+          b.setAttribute("aria-expanded", "false");
+          const p = b.querySelector(".record-row-plus");
+          if (p) p.textContent = "＋";
+        });
+        document.querySelectorAll(".record-inline-detail").forEach((d) => {
+          d.classList.remove("is-open");
+        });
+      });
+    }
+  }
+
+  // --------------------------------------------------------------------------
+  // 6. スマホ表示プレビュー機能
   // --------------------------------------------------------------------------
   const previewBtn = document.getElementById("mobile-preview-btn");
   const previewModal = document.getElementById("mobile-preview-modal");

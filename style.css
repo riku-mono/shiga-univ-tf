@@ -1,6 +1,10 @@
 /* ==========================================================================
    滋賀大学陸上競技部 ウェブサイト スタイルシート (style.css)
-   Figmaデザイン (19:2 新提案｜トップ｜PC / 19:24 新提案｜トップ｜スマホ) 準拠
+   Figmaデザイン全8フレーム（PC版・スマホ版・中間幅）準拠
+   - トップページ: 19:2 (PC) / 19:24 (スマホ)
+   - 新入生向け: 19:42 (PC) / 19:64 (スマホ)
+   - 部員紹介: 19:82 (PC) / 19:102 (スマホ)
+   - 滋賀大記録: 19:118 (PC) / 19:138 (スマホ)
    ========================================================================== */
 
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&family=Noto+Sans+JP:wght@400;500;700;900&display=swap');
@@ -18,6 +22,8 @@
   --danger-bg: #fff5f5;
   --success: #0f6b3d;
   --success-bg: #edfcf4;
+  /* PC画面幅に応じてスムーズに伸縮する左右余白（1440px時に120px） */
+  --section-px: clamp(24px, 8.333vw, 160px);
 }
 
 *,
@@ -31,6 +37,7 @@
 html {
   scroll-behavior: smooth;
   font-size: 16px;
+  width: 100%;
 }
 
 body {
@@ -39,6 +46,7 @@ body {
   background-color: var(--white);
   line-height: 1.65;
   -webkit-font-smoothing: antialiased;
+  width: 100%;
   overflow-x: hidden;
 }
 
@@ -58,21 +66,22 @@ select {
   font-family: 'Inter', 'Noto Sans JP', sans-serif;
 }
 
+/* サイト全体の横幅をブラウザサイズ（100%）に合わせる */
 .page-wrapper {
-  max-width: 1440px;
-  margin: 0 auto;
-  background-color: var(--white);
+  width: 100%;
   min-height: 100vh;
+  background-color: var(--white);
   display: flex;
   flex-direction: column;
 }
 
 main {
   flex: 1;
+  width: 100%;
 }
 
 /* ==========================================================================
-   Header (19:3 PC / 19:25 SP)
+   Header (19:3 / 19:43 / 19:83 / 19:119 PC, 19:25 / 19:65 / 19:103 / 19:139 SP)
    ========================================================================== */
 .site-header {
   background-color: var(--brand-blue);
@@ -84,8 +93,8 @@ main {
 }
 
 .header-inner {
-  max-width: 1440px;
-  margin: 0 auto;
+  width: 100%;
+  min-height: 100px;
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -188,7 +197,7 @@ main {
   flex-direction: column;
   align-items: center;
   gap: 22px;
-  padding: 115px 120px 40px;
+  padding: 115px var(--section-px) 40px;
   overflow: hidden;
   text-align: center;
   color: var(--white);
@@ -299,11 +308,11 @@ main {
 }
 
 /* ==========================================================================
-   Section Common Layout (News / Explore / FAQ / Contact)
+   Section Common Layout (Top Page & Subpages)
    ========================================================================== */
 .top-section {
   width: 100%;
-  padding: 72px 120px;
+  padding: 72px var(--section-px);
   display: flex;
   flex-direction: column;
   align-items: flex-start;
@@ -316,6 +325,42 @@ main {
 
 .top-section--pale {
   background-color: var(--bg-pale);
+}
+
+.subpage-section {
+  width: 100%;
+  padding: 64px var(--section-px);
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 32px;
+}
+
+.subpage-section--white {
+  background-color: var(--white);
+}
+
+.subpage-section--pale {
+  background-color: var(--bg-pale);
+}
+
+.subpage-section--blue {
+  background-color: var(--brand-blue);
+  color: var(--white);
+}
+
+.breadcrumb-line {
+  font-family: 'Noto Sans JP', sans-serif;
+  font-weight: 400;
+  font-size: 11px;
+  line-height: 1.65;
+  color: var(--text-muted);
+  white-space: pre-wrap;
+  width: 100%;
+}
+
+.breadcrumb-line a:hover {
+  text-decoration: underline;
 }
 
 .section-eyebrow {
@@ -345,8 +390,179 @@ main {
   width: 100%;
 }
 
+.subpage-heading {
+  font-family: 'Noto Sans JP', sans-serif;
+  font-weight: 700;
+  color: var(--text-dark);
+  width: 100%;
+}
+
+.subpage-heading--recruit {
+  font-size: 34px;
+  line-height: 1.7;
+}
+
+.subpage-heading--recruit p {
+  line-height: 1.7;
+}
+
+.subpage-heading--large {
+  font-size: 48px;
+  line-height: 1.65;
+}
+
+.subpage-heading--large p {
+  line-height: 1.65;
+}
+
+.subpage-lead {
+  font-family: 'Noto Sans JP', sans-serif;
+  font-weight: 400;
+  font-size: 17px;
+  line-height: 1.65;
+  color: var(--text-muted);
+  width: 100%;
+}
+
+.subpage-lead p {
+  line-height: 1.65;
+}
+
+.subpage-sec-title {
+  font-family: 'Noto Sans JP', sans-serif;
+  font-weight: 700;
+  font-size: 34px;
+  line-height: 1.65;
+  color: var(--text-dark);
+  width: 100%;
+}
+
+.subpage-footnote {
+  font-family: 'Noto Sans JP', sans-serif;
+  font-weight: 400;
+  font-size: 11px;
+  line-height: 1.65;
+  color: var(--text-muted);
+  width: 100%;
+}
+
+/* 共通バー型ボタン */
+.blue-bar-btn {
+  width: 100%;
+  background-color: var(--brand-blue);
+  color: var(--white);
+  padding: 16px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  transition: background-color 0.15s, transform 0.15s;
+}
+
+.blue-bar-btn:hover {
+  background-color: var(--brand-blue-hover);
+  transform: translateY(-1px);
+}
+
+.blue-bar-btn-text {
+  flex: 1 0 0;
+  min-width: 0;
+  font-family: 'Noto Sans JP', sans-serif;
+  font-weight: 700;
+  font-size: 14px;
+  line-height: 1.7;
+  white-space: pre-wrap;
+}
+
+.blue-bar-btn-arrow {
+  font-family: 'Noto Sans JP', sans-serif;
+  font-weight: 400;
+  font-size: 20px;
+  line-height: 1.7;
+  flex-shrink: 0;
+}
+
+.white-bar-btn {
+  width: 100%;
+  background-color: var(--white);
+  color: var(--brand-blue);
+  padding: 16px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  transition: background-color 0.15s, transform 0.15s;
+}
+
+.white-bar-btn:hover {
+  background-color: var(--bg-pale);
+  transform: translateY(-1px);
+}
+
+.white-bar-btn-text {
+  flex: 1 0 0;
+  min-width: 0;
+  font-family: 'Noto Sans JP', sans-serif;
+  font-weight: 700;
+  font-size: 14px;
+  line-height: 1.7;
+}
+
+.white-bar-btn-arrow {
+  font-family: 'Noto Sans JP', sans-serif;
+  font-weight: 400;
+  font-size: 20px;
+  line-height: 1.7;
+  flex-shrink: 0;
+}
+
+/* 青背景CTAセクション (19:58 / 19:96) */
+.blue-sec-eyebrow {
+  font-family: 'Inter', sans-serif;
+  font-weight: 700;
+  font-size: 11px;
+  line-height: 1.65;
+  color: var(--white);
+  width: 100%;
+}
+
+.blue-sec-heading {
+  font-family: 'Noto Sans JP', sans-serif;
+  font-weight: 700;
+  font-size: 42px;
+  line-height: 1.65;
+  color: var(--white);
+  width: 100%;
+}
+
+.blue-sec-heading--members {
+  font-size: 36px;
+}
+
+.blue-sec-desc {
+  font-family: 'Noto Sans JP', sans-serif;
+  font-weight: 400;
+  font-size: 14px;
+  line-height: 1.65;
+  color: var(--white);
+  width: 100%;
+}
+
+.blue-sec-inline-link {
+  font-family: 'Noto Sans JP', sans-serif;
+  font-weight: 700;
+  font-size: 15px;
+  line-height: 1.65;
+  color: var(--white);
+  white-space: pre-wrap;
+  transition: opacity 0.15s;
+}
+
+.blue-sec-inline-link:hover {
+  opacity: 0.85;
+  text-decoration: underline;
+}
+
 /* ==========================================================================
-   News Section (19:15 PC / 19:33 SP)
+   Top Page: News Section (19:15 PC / 19:33 SP)
    ========================================================================== */
 .news-list {
   width: 100%;
@@ -411,7 +627,7 @@ main {
 }
 
 /* ==========================================================================
-   Explore Section (19:16 PC / 19:34 SP — 滋賀大陸上部を知る。)
+   Top Page: Explore Section (19:16 PC / 19:34 SP)
    ========================================================================== */
 .explore-grid {
   width: 100%;
@@ -502,7 +718,7 @@ main {
 }
 
 /* ==========================================================================
-   FAQ Section (19:17 PC / 19:35 SP — よくある質問)
+   Top Page: FAQ Section (19:17 PC / 19:35 SP)
    ========================================================================== */
 .faq-stack {
   width: 100%;
@@ -556,7 +772,7 @@ main {
 }
 
 /* ==========================================================================
-   Contact Section (19:18 PC / 19:36 SP — お問い合わせ)
+   Top Page: Contact Section (19:18 PC / 19:36 SP)
    ========================================================================== */
 .contact-columns {
   width: 100%;
@@ -624,7 +840,6 @@ main {
   flex-shrink: 0;
 }
 
-/* メールフォーム (19:223) */
 .contact-form-col {
   flex: 1 0 0;
   min-width: 0;
@@ -776,7 +991,6 @@ main {
   color: var(--text-muted);
 }
 
-/* 確認画面・完了画面・失敗画面 */
 .form-confirm-view,
 .form-result-view {
   display: none;
@@ -843,7 +1057,640 @@ main {
 }
 
 /* ==========================================================================
-   Footer (19:19 PC / 19:37 SP)
+   Subpage 1: 新入生向けの情報 (recruit.html — 19:42 PC / 19:64 SP)
+   ========================================================================== */
+.recruit-hero-img-wrap {
+  width: 100%;
+  height: 290px;
+  position: relative;
+  overflow: hidden;
+}
+
+.recruit-hero-img-wrap picture,
+.recruit-hero-img-wrap img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.recruit-anchor-nav {
+  font-family: 'Noto Sans JP', sans-serif;
+  font-weight: 500;
+  font-size: 13px;
+  line-height: 1.7;
+  color: var(--brand-blue);
+  white-space: pre-wrap;
+  width: 100%;
+}
+
+.recruit-anchor-nav a:hover {
+  text-decoration: underline;
+}
+
+.campus-cards-grid {
+  width: 100%;
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 24px;
+}
+
+.campus-card {
+  background-color: var(--bg-pale);
+  padding: 32px;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 20px;
+  line-height: 1.7;
+}
+
+.campus-card-en {
+  font-family: 'Inter', sans-serif;
+  font-weight: 700;
+  font-size: 12px;
+  color: var(--brand-blue);
+  width: 100%;
+}
+
+.campus-card-title {
+  font-family: 'Noto Sans JP', sans-serif;
+  font-weight: 700;
+  font-size: 26px;
+  color: var(--text-dark);
+  width: 100%;
+}
+
+.campus-info-item {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 4px;
+}
+
+.campus-info-label {
+  font-family: 'Noto Sans JP', sans-serif;
+  font-weight: 400;
+  font-size: 12px;
+  color: var(--text-muted);
+  width: 100%;
+}
+
+.campus-info-value {
+  font-family: 'Noto Sans JP', sans-serif;
+  font-weight: 500;
+  font-size: 19px;
+  color: var(--text-dark);
+  width: 100%;
+}
+
+.practice-places-heading {
+  font-family: 'Noto Sans JP', sans-serif;
+  font-weight: 700;
+  font-size: 17px;
+  line-height: 1.7;
+  color: var(--text-dark);
+  width: 100%;
+}
+
+.practice-places-list {
+  font-family: 'Noto Sans JP', sans-serif;
+  font-weight: 400;
+  font-size: 14px;
+  line-height: 1.7;
+  color: var(--text-muted);
+  width: 100%;
+}
+
+.events-white-card {
+  width: 100%;
+  background-color: var(--white);
+  padding: 32px;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 16px;
+}
+
+.events-card-title {
+  font-family: 'Noto Sans JP', sans-serif;
+  font-weight: 700;
+  font-size: 26px;
+  line-height: 1.7;
+  color: var(--text-dark);
+  width: 100%;
+}
+
+.events-card-body {
+  font-family: 'Noto Sans JP', sans-serif;
+  font-weight: 400;
+  font-size: 14px;
+  line-height: 1.7;
+  color: var(--text-muted);
+  width: 100%;
+}
+
+.events-card-body p {
+  line-height: 1.7;
+}
+
+.greetings-grid {
+  width: 100%;
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 24px;
+}
+
+.greeting-card {
+  background-color: var(--bg-pale);
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 16px;
+  line-height: 1.7;
+}
+
+.greeting-role {
+  font-family: 'Noto Sans JP', sans-serif;
+  font-weight: 700;
+  font-size: 13px;
+  color: var(--brand-blue);
+  white-space: pre-wrap;
+  width: 100%;
+}
+
+.greeting-title {
+  font-family: 'Noto Sans JP', sans-serif;
+  font-weight: 700;
+  font-size: 24px;
+  color: var(--text-dark);
+  width: 100%;
+}
+
+.greeting-body {
+  font-family: 'Noto Sans JP', sans-serif;
+  font-weight: 400;
+  font-size: 14px;
+  color: var(--text-muted);
+  width: 100%;
+}
+
+/* ==========================================================================
+   Subpage 2: 部員紹介 (members.html — 19:82 PC / 19:102 SP)
+   ========================================================================== */
+.grade-tabs {
+  width: 100%;
+  display: flex;
+  align-items: stretch;
+  gap: 12px;
+}
+
+.grade-tab {
+  flex: 1 0 0;
+  min-width: 0;
+  background-color: var(--bg-pale);
+  color: var(--text-dark);
+  border: none;
+  padding: 16px;
+  font-family: 'Noto Sans JP', sans-serif;
+  font-weight: 700;
+  font-size: 15px;
+  line-height: 1.65;
+  text-align: center;
+  cursor: pointer;
+  transition: background-color 0.15s, color 0.15s;
+}
+
+.grade-tab:hover {
+  background-color: #e2edf5;
+}
+
+.grade-tab.is-active {
+  background-color: var(--brand-blue);
+  color: var(--white);
+}
+
+.members-disclaimer {
+  font-family: 'Noto Sans JP', sans-serif;
+  font-weight: 400;
+  font-size: 12px;
+  line-height: 1.65;
+  color: var(--text-muted);
+  width: 100%;
+}
+
+.members-cards-grid {
+  width: 100%;
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 24px;
+}
+
+.member-card {
+  background-color: var(--bg-pale);
+  padding: 32px;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 18px;
+  line-height: 1.65;
+}
+
+.member-card-top {
+  width: 100%;
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+  color: var(--brand-blue);
+  font-weight: 700;
+}
+
+.member-event-tag {
+  flex: 1 0 0;
+  min-width: 0;
+  font-family: 'Noto Sans JP', sans-serif;
+  font-weight: 700;
+  font-size: 12px;
+}
+
+.member-num {
+  font-family: 'Inter', sans-serif;
+  font-weight: 700;
+  font-size: 28px;
+  white-space: nowrap;
+}
+
+.member-kana {
+  font-family: 'Noto Sans JP', sans-serif;
+  font-weight: 400;
+  font-size: 11px;
+  color: var(--text-muted);
+  width: 100%;
+}
+
+.member-name {
+  font-family: 'Noto Sans JP', sans-serif;
+  font-weight: 700;
+  font-size: 32px;
+  color: var(--text-dark);
+  width: 100%;
+}
+
+.member-faculty {
+  font-family: 'Noto Sans JP', sans-serif;
+  font-weight: 500;
+  font-size: 13px;
+  color: var(--brand-blue);
+  white-space: pre-wrap;
+  width: 100%;
+}
+
+.member-details {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 10px;
+  font-family: 'Noto Sans JP', sans-serif;
+  font-weight: 400;
+  font-size: 14px;
+  color: var(--text-dark);
+  white-space: pre-wrap;
+}
+
+.member-pb-box {
+  width: 100%;
+  background-color: var(--white);
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 4px;
+}
+
+.member-pb-label {
+  font-family: 'Inter', sans-serif;
+  font-weight: 700;
+  font-size: 10px;
+  color: var(--brand-blue);
+  width: 100%;
+}
+
+.member-pb-value {
+  font-family: 'Noto Sans JP', sans-serif;
+  font-weight: 700;
+  font-size: 30px;
+  color: var(--text-dark);
+  width: 100%;
+}
+
+.member-comment {
+  font-family: 'Noto Sans JP', sans-serif;
+  font-weight: 500;
+  font-size: 14px;
+  color: var(--text-dark);
+  width: 100%;
+}
+
+/* ==========================================================================
+   Subpage 3: 滋賀大記録 (records.html — 19:118 PC / 19:138 SP)
+   ========================================================================== */
+.record-cat-tabs {
+  width: 100%;
+  display: flex;
+  align-items: stretch;
+  gap: 8px;
+}
+
+.record-cat-tab {
+  flex: 1 0 0;
+  min-width: 0;
+  background-color: var(--bg-pale);
+  color: var(--text-dark);
+  border: none;
+  padding: 16px;
+  font-family: 'Noto Sans JP', sans-serif;
+  font-weight: 700;
+  font-size: 14px;
+  line-height: 1.65;
+  text-align: center;
+  cursor: pointer;
+  transition: background-color 0.15s, color 0.15s;
+}
+
+.record-cat-tab:hover {
+  background-color: #e2edf5;
+}
+
+.record-cat-tab.is-active {
+  background-color: var(--brand-blue);
+  color: var(--white);
+}
+
+.records-cat-heading {
+  font-family: 'Noto Sans JP', sans-serif;
+  font-weight: 700;
+  font-size: 30px;
+  line-height: 1.65;
+  color: var(--text-dark);
+  width: 100%;
+}
+
+.records-layout-note {
+  font-family: 'Noto Sans JP', sans-serif;
+  font-weight: 400;
+  font-size: 13px;
+  line-height: 1.65;
+  color: var(--text-muted);
+  width: 100%;
+}
+
+.records-layout-note--sp {
+  display: none;
+}
+
+.records-columns {
+  width: 100%;
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 32px;
+  align-items: start;
+}
+
+.records-col {
+  width: 100%;
+  background-color: var(--white);
+  display: flex;
+  flex-direction: column;
+}
+
+.records-col-head {
+  width: 100%;
+  background-color: var(--brand-blue);
+  color: var(--white);
+  padding: 20px;
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+  font-weight: 700;
+}
+
+.records-col-head-jp {
+  font-family: 'Noto Sans JP', sans-serif;
+  font-weight: 700;
+  font-size: 23px;
+  line-height: 1.65;
+  flex: 1 0 0;
+}
+
+.records-col-head-en {
+  font-family: 'Inter', sans-serif;
+  font-weight: 700;
+  font-size: 11px;
+  line-height: 1.65;
+  white-space: nowrap;
+}
+
+.records-table-head {
+  width: 100%;
+  background-color: var(--bg-pale);
+  color: var(--text-muted);
+  padding: 16px;
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  font-size: 11px;
+  line-height: 1.65;
+}
+
+.records-th-event,
+.records-th-val {
+  flex: 1 0 0;
+  min-width: 0;
+  font-family: 'Noto Sans JP', sans-serif;
+  font-weight: 700;
+}
+
+.records-th-detail {
+  font-family: 'Noto Sans JP', sans-serif;
+  font-weight: 400;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.records-rows {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+.record-item-wrap {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+.record-row-btn {
+  width: 100%;
+  background-color: var(--white);
+  border: none;
+  border-bottom: 1px solid var(--border-light);
+  padding: 16px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  text-align: left;
+  cursor: pointer;
+  transition: background-color 0.15s;
+}
+
+.record-row-btn:hover,
+.record-row-btn.is-selected {
+  background-color: var(--bg-pale);
+}
+
+.record-row-event {
+  flex: 1 0 0;
+  min-width: 0;
+  font-family: 'Noto Sans JP', sans-serif;
+  font-weight: 500;
+  font-size: 14px;
+  line-height: 1.65;
+  color: var(--text-dark);
+}
+
+.record-row-val {
+  flex: 1 0 0;
+  min-width: 0;
+  font-family: 'Noto Sans JP', sans-serif;
+  font-weight: 700;
+  font-size: 17px;
+  line-height: 1.65;
+  color: var(--brand-blue);
+}
+
+.record-row-plus {
+  font-family: 'Noto Sans JP', sans-serif;
+  font-weight: 400;
+  font-size: 18px;
+  line-height: 1.65;
+  color: var(--brand-blue);
+  flex-shrink: 0;
+  white-space: nowrap;
+}
+
+/* 行直下に展開するインライン詳細 */
+.record-inline-detail {
+  display: none;
+  background-color: var(--bg-pale);
+  border-bottom: 1px solid var(--border-light);
+  padding: 14px 16px 16px;
+  font-size: 13px;
+  color: var(--text-dark);
+  gap: 6px;
+  flex-direction: column;
+}
+
+.record-inline-detail.is-open {
+  display: flex;
+}
+
+.record-inline-line {
+  display: flex;
+  gap: 12px;
+}
+
+.record-inline-line span:first-child {
+  color: var(--text-muted);
+  width: 84px;
+  flex-shrink: 0;
+  font-size: 12px;
+}
+
+.records-empty-msg {
+  padding: 24px 16px;
+  font-size: 13px;
+  color: var(--text-muted);
+  border-bottom: 1px solid var(--border-light);
+}
+
+/* RECORD DETAIL カード (19:132 PC / 19:148 SP) */
+.record-detail-card {
+  width: 100%;
+  background-color: var(--white);
+  padding: 40px;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 24px;
+  line-height: 1.65;
+}
+
+.record-detail-event {
+  font-family: 'Noto Sans JP', sans-serif;
+  font-weight: 700;
+  font-size: 28px;
+  color: var(--text-dark);
+  width: 100%;
+}
+
+.record-detail-value {
+  font-family: 'Noto Sans JP', sans-serif;
+  font-weight: 700;
+  font-size: 64px;
+  color: var(--brand-blue);
+  width: 100%;
+  line-height: 1.3;
+}
+
+.record-detail-row {
+  width: 100%;
+  display: flex;
+  align-items: flex-start;
+  gap: 24px;
+}
+
+.record-detail-label {
+  font-family: 'Noto Sans JP', sans-serif;
+  font-weight: 400;
+  font-size: 12px;
+  color: var(--text-muted);
+  width: 160px;
+  flex-shrink: 0;
+}
+
+.record-detail-data {
+  flex: 1 0 0;
+  min-width: 0;
+  font-family: 'Noto Sans JP', sans-serif;
+  font-weight: 500;
+  font-size: 16px;
+  color: var(--text-dark);
+}
+
+.record-detail-close {
+  background: none;
+  border: none;
+  padding: 0;
+  font-family: 'Noto Sans JP', sans-serif;
+  font-weight: 700;
+  font-size: 13px;
+  line-height: 1.65;
+  color: var(--brand-blue);
+  cursor: pointer;
+  white-space: pre-wrap;
+}
+
+.record-detail-close:hover {
+  opacity: 0.8;
+}
+
+/* ==========================================================================
+   Footer (19:19 / 19:59 / 19:97 / 19:133 PC, 19:37 / 19:77 / 19:113 / 19:149 SP)
    ========================================================================== */
 .site-footer {
   background-color: var(--brand-blue);
@@ -852,8 +1699,7 @@ main {
 }
 
 .footer-inner {
-  max-width: 1440px;
-  margin: 0 auto;
+  width: 100%;
   padding: 64px;
   display: flex;
   flex-direction: column;
@@ -964,14 +1810,12 @@ main {
    中間の画面幅（タブレット・小型ノートPC: 769px〜1100px）への対応
    ========================================================================== */
 @media (max-width: 1100px) {
-  .hero-section,
-  .top-section {
-    padding-left: 48px;
-    padding-right: 48px;
-  }
-
   .hero-heading {
     font-size: 52px;
+  }
+
+  .subpage-heading--large {
+    font-size: 40px;
   }
 
   .contact-columns {
@@ -984,7 +1828,7 @@ main {
 }
 
 /* ==========================================================================
-   スマホ版（Figma 19:24 準拠：〜768px）
+   スマホ版（Figma 19:24 / 19:64 / 19:102 / 19:138 準拠：〜768px）
    ========================================================================== */
 @media (max-width: 768px) {
   .header-inner {
@@ -1063,9 +1907,14 @@ main {
     font-size: 8px;
   }
 
-  /* Sections SP */
+  /* Common Sections SP */
   .top-section {
     padding: 48px 24px;
+    gap: 24px;
+  }
+
+  .subpage-section {
+    padding: 44px 24px;
     gap: 24px;
   }
 
@@ -1075,6 +1924,30 @@ main {
 
   .section-sublead {
     font-size: 13px;
+  }
+
+  .subpage-heading--recruit {
+    font-size: 26px;
+  }
+
+  .subpage-heading--large {
+    font-size: 32px;
+  }
+
+  .subpage-lead {
+    font-size: 14px;
+  }
+
+  .subpage-sec-title {
+    font-size: 26px;
+  }
+
+  .blue-sec-heading {
+    font-size: 30px;
+  }
+
+  .blue-sec-heading--members {
+    font-size: 28px;
   }
 
   /* News SP (19:33) */
@@ -1149,6 +2022,131 @@ main {
   }
 
   .form-submit-label {
+    font-size: 14px;
+  }
+
+  /* Recruit SP (19:64) */
+  .recruit-hero-img-wrap {
+    height: 210px;
+  }
+
+  .recruit-anchor-nav {
+    font-size: 11px;
+  }
+
+  .campus-cards-grid {
+    grid-template-columns: 1fr;
+    gap: 24px;
+  }
+
+  .campus-card {
+    padding: 24px;
+  }
+
+  .campus-card-title {
+    font-size: 23px;
+  }
+
+  .campus-info-value {
+    font-size: 16px;
+  }
+
+  .events-white-card {
+    padding: 24px;
+  }
+
+  .events-card-title {
+    font-size: 22px;
+  }
+
+  .greetings-grid {
+    grid-template-columns: 1fr;
+    gap: 24px;
+  }
+
+  .greeting-title {
+    font-size: 21px;
+  }
+
+  /* Members SP (19:102) */
+  .grade-tabs {
+    gap: 4px;
+  }
+
+  .grade-tab {
+    padding: 8px;
+    font-size: 11px;
+  }
+
+  .members-cards-grid {
+    grid-template-columns: 1fr;
+    gap: 24px;
+  }
+
+  .member-card {
+    padding: 24px;
+  }
+
+  .member-name {
+    font-size: 28px;
+  }
+
+  .member-pb-value {
+    font-size: 24px;
+  }
+
+  /* Records SP (19:138) */
+  .record-cat-tabs {
+    gap: 8px;
+  }
+
+  .record-cat-tab {
+    padding: 8px;
+    font-size: 10px;
+  }
+
+  .records-cat-heading {
+    font-size: 24px;
+  }
+
+  .records-layout-note--pc {
+    display: none;
+  }
+
+  .records-layout-note--sp {
+    display: block;
+  }
+
+  .records-columns {
+    grid-template-columns: 1fr;
+    gap: 40px;
+  }
+
+  .record-row-event {
+    font-size: 12px;
+  }
+
+  .record-row-val {
+    font-size: 14px;
+  }
+
+  .record-detail-card {
+    padding: 24px;
+  }
+
+  .record-detail-event {
+    font-size: 22px;
+  }
+
+  .record-detail-value {
+    font-size: 48px;
+  }
+
+  .record-detail-label {
+    width: 84px;
+  }
+
+  .record-detail-data {
     font-size: 14px;
   }
 
