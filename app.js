@@ -477,32 +477,183 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   // --------------------------------------------------------------------------
-  // 6. スマホ表示プレビュー機能
+  // 6. スマホ表示プレビュー機能（iPhone Dynamic Island / ノッチ / Safari実画面再現）
   // --------------------------------------------------------------------------
   const previewBtn = document.getElementById("mobile-preview-btn");
   const previewModal = document.getElementById("mobile-preview-modal");
-  const previewClose = document.getElementById("mobile-preview-close");
-  const previewIframe = document.getElementById("mobile-preview-iframe");
 
-  if (window.location.search.includes("mobile_preview=1") && previewBtn) {
+  // iframe内部で表示されている場合は右下のプレビューボタンを非表示にする
+  if ((window.self !== window.top || window.location.search.includes("mobile_preview=1")) && previewBtn) {
     previewBtn.style.display = "none";
   }
 
-  if (previewBtn && previewModal && previewClose && previewIframe) {
+  if (previewBtn && previewModal && window.self === window.top) {
+    // 既存のモーダル内部を iPhone 実機シミュレーター構造へアップグレード
+    previewModal.innerHTML = `
+      <div class="mobile-preview-toolbar">
+        <div class="preview-toolbar-group">
+          <span>📱 機種切替：</span>
+          <button type="button" class="preview-device-btn is-active" data-device-model="iphone15">
+            iPhone 15/16（Dynamic Island）
+          </button>
+          <button type="button" class="preview-device-btn" data-device-model="iphone14">
+            iPhone 13/14（ノッチ）
+          </button>
+          <button type="button" class="preview-device-btn" data-device-model="iphonese">
+            iPhone SE
+          </button>
+        </div>
+        <div class="preview-toolbar-group">
+          <button type="button" id="preview-safari-toggle" class="preview-safari-toggle is-active">
+            Safari下部バー：表示中
+          </button>
+          <button type="button" id="mobile-preview-close" class="mobile-preview-close">
+            ✕ PC表示に戻る
+          </button>
+        </div>
+      </div>
+
+      <div id="iphone-stage" class="iphone-stage">
+        <div id="mobile-device-frame" class="mobile-device-frame" data-model="iphone15">
+          <div class="iphone-screen">
+            <!-- 上部 iOSステータスバー ＆ Dynamic Island（内カメ） / ノッチ -->
+            <div class="ios-status-bar">
+              <span id="ios-clock" class="ios-time">9:41</span>
+              <div class="ios-cutout" title="Dynamic Island / フロントカメラ領域">
+                <span class="ios-camera-lens"></span>
+              </div>
+              <div class="ios-status-icons" aria-hidden="true">
+                <!-- 電波・Wi-Fi・バッテリーアイコン -->
+                <svg width="16" height="11" viewBox="0 0 16 11" fill="currentColor">
+                  <rect x="0" y="7" width="3" height="4" rx="0.8"/>
+                  <rect x="4.2" y="5" width="3" height="6" rx="0.8"/>
+                  <rect x="8.4" y="2.5" width="3" height="8.5" rx="0.8"/>
+                  <rect x="12.6" y="0" width="3" height="11" rx="0.8"/>
+                </svg>
+                <span style="font-size: 11px; font-weight: 700;">5G</span>
+                <svg width="22" height="11" viewBox="0 0 22 11" fill="none">
+                  <rect x="0.5" y="0.5" width="18" height="10" rx="2.5" stroke="currentColor" stroke-opacity="0.85"/>
+                  <rect x="2" y="2" width="14" height="7" rx="1.2" fill="currentColor"/>
+                  <path d="M20 3.5V7.5C20.8 7.1 21.3 6.3 21.3 5.5C21.3 4.7 20.8 3.9 20 3.5Z" fill="currentColor" fill-opacity="0.85"/>
+                </svg>
+              </div>
+            </div>
+
+            <!-- Webサイト実表示領域（iframe） -->
+            <div class="iphone-webview-wrap">
+              <iframe id="mobile-preview-iframe" title="iPhone実画面プレビュー"></iframe>
+            </div>
+
+            <!-- 下部 iOS Safari アドレスバー・ナビバー・ホームインジケーター -->
+            <div class="ios-safari-bottom">
+              <div class="ios-address-pill">
+                <span style="font-size: 11px; color: #587084;">ぁあ</span>
+                <span id="ios-address-text" class="ios-address-domain">🔒 shiga-univ-tf.jp</span>
+                <button type="button" id="ios-reload-btn" title="再読み込み" style="background:none;border:none;cursor:pointer;font-size:13px;color:#142e48;">↻</button>
+              </div>
+              <div class="ios-nav-icons" aria-hidden="true">
+                <span>‹</span>
+                <span style="opacity:0.4;">›</span>
+                <span>↑</span>
+                <span>📖</span>
+                <span>⧉</span>
+              </div>
+              <div class="ios-home-indicator"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    `;
+
+    const previewClose = document.getElementById("mobile-preview-close");
+    const previewIframe = document.getElementById("mobile-preview-iframe");
+    const deviceFrame = document.getElementById("mobile-device-frame");
+    const iphoneStage = document.getElementById("iphone-stage");
+    const deviceBtns = previewModal.querySelectorAll("[data-device-model]");
+    const safariToggle = document.getElementById("preview-safari-toggle");
+    const reloadBtn = document.getElementById("ios-reload-btn");
+    const addressText = document.getElementById("ios-address-text");
+    const iosClock = document.getElementById("ios-clock");
+
+    function updateClock() {
+      if (!iosClock) return;
+      const now = new Date();
+      const hh = String(now.getHours()).padStart(2, "0");
+      const mm = String(now.getMinutes()).padStart(2, "0");
+      iosClock.textContent = `${hh}:${mm}`;
+    }
+
+    function fitDeviceToScreen() {
+      if (!deviceFrame || !iphoneStage || !previewModal.classList.contains("open")) return;
+      const stageRect = iphoneStage.getBoundingClientRect();
+      const model = deviceFrame.getAttribute("data-model") || "iphone15";
+      const naturalH = model === "iphonese" ? 767 : model === "iphone14" ? 868 : 876;
+      const naturalW = model === "iphonese" ? 399 : model === "iphone14" ? 414 : 417;
+
+      const scaleH = (stageRect.height - 16) / naturalH;
+      const scaleW = (stageRect.width - 16) / naturalW;
+      const scale = Math.min(1, Math.max(0.5, Math.min(scaleH, scaleW)));
+      deviceFrame.style.setProperty("--device-scale", scale.toFixed(3));
+    }
+
+    window.addEventListener("resize", fitDeviceToScreen);
+
     previewBtn.addEventListener("click", () => {
+      updateClock();
       const baseUrl = window.location.href.split("?")[0].split("#")[0];
-      previewIframe.setAttribute("src", `${baseUrl}?mobile_preview=1`);
+      const hash = window.location.hash || "";
+      previewIframe.setAttribute("src", `${baseUrl}?mobile_preview=1${hash}`);
       previewModal.classList.add("open");
       previewModal.setAttribute("aria-hidden", "false");
+      requestAnimationFrame(fitDeviceToScreen);
     });
 
-    previewClose.addEventListener("click", () => {
-      previewModal.classList.remove("open");
-      previewModal.setAttribute("aria-hidden", "true");
+    if (previewIframe && addressText) {
+      previewIframe.addEventListener("load", () => {
+        try {
+          const loc = previewIframe.contentWindow.location;
+          const pageName = loc.pathname.split("/").pop() || "index.html";
+          addressText.textContent = `🔒 shiga-univ-tf.jp/${pageName === "index.html" ? "" : pageName}`;
+        } catch (err) {
+          addressText.textContent = "🔒 shiga-univ-tf.jp";
+        }
+      });
+    }
+
+    if (reloadBtn && previewIframe) {
+      reloadBtn.addEventListener("click", () => {
+        if (previewIframe.contentWindow) {
+          previewIframe.contentWindow.location.reload();
+        }
+      });
+    }
+
+    deviceBtns.forEach((btn) => {
+      btn.addEventListener("click", () => {
+        const model = btn.getAttribute("data-device-model") || "iphone15";
+        deviceFrame.setAttribute("data-model", model);
+        deviceBtns.forEach((b) => b.classList.toggle("is-active", b === btn));
+        requestAnimationFrame(fitDeviceToScreen);
+      });
     });
+
+    if (safariToggle && deviceFrame) {
+      safariToggle.addEventListener("click", () => {
+        const hidden = deviceFrame.classList.toggle("hide-safari-bar");
+        safariToggle.classList.toggle("is-active", !hidden);
+        safariToggle.textContent = hidden ? "Safari下部バー：非表示（最大表示）" : "Safari下部バー：表示中";
+      });
+    }
+
+    if (previewClose) {
+      previewClose.addEventListener("click", () => {
+        previewModal.classList.remove("open");
+        previewModal.setAttribute("aria-hidden", "true");
+      });
+    }
 
     previewModal.addEventListener("click", (e) => {
-      if (e.target === previewModal) {
+      if (e.target === previewModal || e.target === iphoneStage) {
         previewModal.classList.remove("open");
         previewModal.setAttribute("aria-hidden", "true");
       }

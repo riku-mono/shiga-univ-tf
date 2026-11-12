@@ -1817,7 +1817,19 @@ main {
 }
 
 /* ==========================================================================
-   スマホ表示プレビュー機能（ワンクリック確認用）
+   iPhone実機・Safe Area（Dynamic Island / ノッチ / ホームバー）対応
+   ========================================================================== */
+@supports (padding-top: env(safe-area-inset-top)) {
+  .site-header {
+    padding-top: env(safe-area-inset-top);
+  }
+  .site-footer {
+    padding-bottom: env(safe-area-inset-bottom);
+  }
+}
+
+/* ==========================================================================
+   スマホ表示プレビュー機能（iPhone Dynamic Island / ノッチ / Safari実画面再現）
    ========================================================================== */
 .mobile-preview-fab {
   position: fixed;
@@ -1833,6 +1845,12 @@ main {
   font-weight: 700;
   cursor: pointer;
   box-shadow: 0 4px 16px rgba(0, 83, 155, 0.35);
+  transition: transform 0.15s, background-color 0.15s;
+}
+
+.mobile-preview-fab:hover {
+  background: var(--brand-blue-hover);
+  transform: translateY(-2px);
 }
 
 .mobile-preview-modal {
@@ -1840,11 +1858,13 @@ main {
   position: fixed;
   inset: 0;
   z-index: 1000;
-  background: rgba(20, 46, 72, 0.82);
+  background: rgba(12, 26, 42, 0.88);
+  backdrop-filter: blur(6px);
   flex-direction: column;
   align-items: center;
-  justify-content: center;
-  padding: 16px;
+  justify-content: flex-start;
+  padding: 12px 16px;
+  overflow: hidden;
 }
 
 .mobile-preview-modal.open {
@@ -1853,40 +1873,340 @@ main {
 
 .mobile-preview-toolbar {
   display: flex;
+  flex-wrap: wrap;
   align-items: center;
   justify-content: space-between;
+  gap: 10px;
   width: 100%;
-  max-width: 410px;
+  max-width: 780px;
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  border-radius: 10px;
+  padding: 8px 14px;
   color: var(--white);
   margin-bottom: 10px;
-  font-size: 13px;
+  font-size: 12px;
   font-weight: 700;
+  flex-shrink: 0;
+  z-index: 2;
+}
+
+.preview-toolbar-group {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.preview-device-btn,
+.preview-safari-toggle {
+  background: rgba(255, 255, 255, 0.14);
+  color: var(--white);
+  border: 1px solid rgba(255, 255, 255, 0.24);
+  border-radius: 6px;
+  padding: 5px 10px;
+  font-size: 11px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background-color 0.15s, color 0.15s;
+}
+
+.preview-device-btn:hover,
+.preview-safari-toggle:hover {
+  background: rgba(255, 255, 255, 0.25);
+}
+
+.preview-device-btn.is-active,
+.preview-safari-toggle.is-active {
+  background: var(--white);
+  color: var(--brand-blue);
+  border-color: var(--white);
 }
 
 .mobile-preview-close {
-  background: var(--white);
-  color: var(--brand-blue);
+  background: #e53e3e;
+  color: var(--white);
   border: none;
-  border-radius: 4px;
+  border-radius: 6px;
   padding: 6px 12px;
+  font-size: 12px;
   font-weight: 700;
   cursor: pointer;
 }
 
-.mobile-device-frame {
-  width: 390px;
-  height: 84vh;
-  max-height: 844px;
-  background: var(--white);
-  border: 10px solid #142e48;
-  border-radius: 32px;
+.mobile-preview-close:hover {
+  background: #c53030;
+}
+
+/* スケール調整ラッパー */
+.iphone-stage {
+  flex: 1;
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   overflow: hidden;
+  position: relative;
+}
+
+/* iPhone筐体フレーム */
+.mobile-device-frame {
+  position: relative;
+  width: 393px;
+  height: 852px;
+  background: #000000;
+  border-radius: 54px;
+  padding: 12px;
+  box-shadow:
+    0 0 0 2px #3a3f47,
+    0 0 0 4px #1b1e23,
+    0 24px 60px rgba(0, 0, 0, 0.65);
+  display: flex;
+  flex-direction: column;
+  transform: scale(var(--device-scale, 1));
+  transform-origin: center center;
+  transition: width 0.25s ease, height 0.25s ease, border-radius 0.25s ease;
+  flex-shrink: 0;
+}
+
+/* サイドボタン（音量・電源ボタンのシルエット） */
+.mobile-device-frame::before {
+  content: "";
+  position: absolute;
+  left: -6px;
+  top: 160px;
+  width: 3px;
+  height: 110px;
+  background: #2d3239;
+  border-radius: 2px 0 0 2px;
+}
+
+.mobile-device-frame::after {
+  content: "";
+  position: absolute;
+  right: -6px;
+  top: 200px;
+  width: 3px;
+  height: 76px;
+  background: #2d3239;
+  border-radius: 0 2px 2px 0;
+}
+
+/* 機種ごとの筐体サイズ */
+.mobile-device-frame[data-model="iphone15"] {
+  width: 417px; /* 393 + 24px bezel */
+  height: 876px; /* 852 + 24px bezel */
+  border-radius: 56px;
+}
+
+.mobile-device-frame[data-model="iphone14"] {
+  width: 414px; /* 390 + 24px bezel */
+  height: 868px; /* 844 + 24px bezel */
+  border-radius: 52px;
+}
+
+.mobile-device-frame[data-model="iphonese"] {
+  width: 399px; /* 375 + 24px bezel */
+  height: 767px; /* 上下ベゼル含む */
+  border-radius: 44px;
+  padding: 50px 12px;
+}
+
+/* iPhoneディスプレイ内枠 */
+.iphone-screen {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  background: var(--white);
+  border-radius: 44px;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+.mobile-device-frame[data-model="iphonese"] .iphone-screen {
+  border-radius: 4px;
+}
+
+/* 上部 iOS ステータスバー ＋ Dynamic Island / ノッチ領域 */
+.ios-status-bar {
+  position: relative;
+  width: 100%;
+  height: 54px;
+  background-color: var(--brand-blue);
+  color: var(--white);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 26px 8px;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  font-size: 14px;
+  font-weight: 700;
+  flex-shrink: 0;
+  z-index: 10;
+  user-select: none;
+}
+
+.mobile-device-frame[data-model="iphone14"] .ios-status-bar {
+  height: 48px;
+  padding: 12px 24px 6px;
+}
+
+.mobile-device-frame[data-model="iphonese"] .ios-status-bar {
+  height: 24px;
+  padding: 0 14px;
+  font-size: 12px;
+}
+
+.ios-time {
+  letter-spacing: -0.3px;
+  z-index: 2;
+}
+
+.ios-status-icons {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  z-index: 2;
+}
+
+/* Dynamic Island（ダイナミックアイランド + 内カメレンズ） */
+.ios-cutout {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  background: #000000;
+  z-index: 5;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  padding-right: 11px;
+}
+
+/* iPhone 15 / 16: カプセル型 Dynamic Island */
+.mobile-device-frame[data-model="iphone15"] .ios-cutout {
+  top: 11px;
+  width: 126px;
+  height: 36px;
+  border-radius: 999px;
+  box-shadow: inset 0 0 2px rgba(255, 255, 255, 0.12);
+}
+
+/* iPhone 13 / 14: 上部ノッチ */
+.mobile-device-frame[data-model="iphone14"] .ios-cutout {
+  top: 0;
+  width: 162px;
+  height: 31px;
+  border-radius: 0 0 20px 20px;
+  padding-right: 22px;
+}
+
+/* iPhone SE: 画面内カットアウトなし */
+.mobile-device-frame[data-model="iphonese"] .ios-cutout {
+  display: none;
+}
+
+/* 内カメラ（フロントカメラ）レンズ表現 */
+.ios-camera-lens {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 35% 35%, #2b4c7e 0%, #0d1b2a 55%, #05080d 100%);
+  border: 1.5px solid #1a222d;
+  box-shadow: inset 0 1px 2px rgba(255, 255, 255, 0.25);
+}
+
+/* Webサイト表示領域（iframe） */
+.iphone-webview-wrap {
+  flex: 1;
+  width: 100%;
+  min-height: 0;
+  position: relative;
+  background: var(--white);
 }
 
 .mobile-device-frame iframe {
   width: 100%;
   height: 100%;
   border: none;
+  display: block;
+}
+
+/* 下部 iOS Safari ツールバー ＋ ホームインジケーター */
+.ios-safari-bottom {
+  width: 100%;
+  background: rgba(246, 248, 250, 0.96);
+  border-top: 1px solid #d5dde5;
+  padding: 8px 14px 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  flex-shrink: 0;
+  user-select: none;
+  z-index: 10;
+}
+
+.mobile-device-frame.hide-safari-bar .ios-safari-bottom {
+  padding-top: 4px;
+  background: var(--brand-blue);
+  border-top: none;
+}
+
+.mobile-device-frame.hide-safari-bar .ios-address-pill,
+.mobile-device-frame.hide-safari-bar .ios-nav-icons {
+  display: none;
+}
+
+.ios-address-pill {
+  width: 100%;
+  height: 36px;
+  background: #ffffff;
+  border-radius: 10px;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.08);
+  border: 1px solid #e2e8f0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 12px;
+  font-family: 'Inter', -apple-system, sans-serif;
+  font-size: 12px;
+  color: #142e48;
+}
+
+.ios-address-domain {
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.ios-nav-icons {
+  display: flex;
+  align-items: center;
+  justify-content: space-around;
+  color: #00539b;
+  font-size: 16px;
+  padding: 2px 0;
+}
+
+.ios-home-indicator {
+  width: 134px;
+  height: 5px;
+  background: #142e48;
+  opacity: 0.85;
+  border-radius: 999px;
+  margin: 2px auto 0;
+}
+
+.mobile-device-frame.hide-safari-bar .ios-home-indicator {
+  background: rgba(255, 255, 255, 0.85);
+}
+
+.mobile-device-frame[data-model="iphonese"] .ios-home-indicator {
+  display: none;
 }
 
 /* ==========================================================================
