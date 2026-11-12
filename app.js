@@ -482,9 +482,12 @@ document.addEventListener("DOMContentLoaded", () => {
   const previewBtn = document.getElementById("mobile-preview-btn");
   const previewModal = document.getElementById("mobile-preview-modal");
 
-  // iframe内部で表示されている場合は右下のプレビューボタンを非表示にする
-  if ((window.self !== window.top || window.location.search.includes("mobile_preview=1")) && previewBtn) {
-    previewBtn.style.display = "none";
+  // iframe内部で表示されている場合は右下のプレビューボタンを非表示にし、スクロールバーも消す
+  if (window.self !== window.top || window.location.search.includes("mobile_preview=1")) {
+    document.documentElement.classList.add("in-mobile-preview");
+    if (previewBtn) {
+      previewBtn.style.display = "none";
+    }
   }
 
   if (previewBtn && previewModal && window.self === window.top) {

@@ -1828,6 +1828,19 @@ main {
   }
 }
 
+html.in-mobile-preview,
+html.in-mobile-preview body {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+html.in-mobile-preview::-webkit-scrollbar,
+html.in-mobile-preview body::-webkit-scrollbar {
+  display: none;
+  width: 0;
+  height: 0;
+}
+
 /* ==========================================================================
    スマホ表示プレビュー機能（iPhone Dynamic Island / ノッチ / Safari実画面再現）
    ========================================================================== */
@@ -2234,6 +2247,19 @@ main {
    スマホ版（Figma 19:24 / 19:64 / 19:102 / 19:138 準拠：〜768px）
    ========================================================================== */
 @media (max-width: 768px) {
+  html,
+  body {
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+  }
+
+  html::-webkit-scrollbar,
+  body::-webkit-scrollbar {
+    display: none;
+    width: 0;
+    height: 0;
+  }
+
   .header-inner {
     padding: 17px 20px;
     gap: 12px;
