@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>滋賀大記録（歴代記録）｜滋賀大学陸上競技部</title>
+  <meta name="description" content="滋賀大学陸上競技部の歴代最高記録（男子・女子）一覧です。男女横並びで種目と記録を確認でき、詳細ボタンを押すと記録会・保持者・樹立日が表示されます。" />
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+  <!-- ==================== ヘッダー ==================== -->
+  <header class="site-header">
+    <div class="container header-inner">
+      <a href="index.html" class="site-logo">
+        <span class="site-logo-sub">SHIGA UNIVERSITY TRACK &amp; FIELD</span>
+        <span class="site-logo-main">滋賀大学陸上競技部</span>
+      </a>
+      <button id="menu-toggle" class="menu-toggle" aria-label="メニューを開く">メニュー ☰</button>
+      <nav id="main-nav" class="main-nav">
+        <ul>
+          <li><a href="index.html">ホーム</a></li>
+          <li><a href="index.html#news">お知らせ</a></li>
+          <li><a href="records.html" class="active">滋賀大記録</a></li>
+          <li><a href="recruit.html">新入生の方へ</a></li>
+          <li><a href="members.html">部員紹介</a></li>
+          <li><a href="index.html#faq">よくある質問</a></li>
+          <li><a href="index.html#contact">お問い合わせ</a></li>
+        </ul>
+      </nav>
+    </div>
+  </header>
+
+  <main>
+    <!-- ページ見出し -->
+    <div class="subpage-header">
+      <div class="container">
+        <h1>滋賀大記録（歴代最高記録）</h1>
+        <p>男女で横に並べて種目・記録を掲載しています。「詳細 ▼」を押すと保持者・記録会（会場）・樹立日が表示されます。</p>
+      </div>
+    </div>
+    <div class="breadcrumb">
+      <div class="container">
+        <a href="index.html">ホーム</a> &gt; 滋賀大記録
+      </div>
+    </div>
+
+    <section class="section">
+      <div class="container">
+        <div style="text-align: center; margin-bottom: 20px;">
+          <button type="button" id="toggle-all-details" class="tab-btn">
+            すべての詳細（保持者・記録会など）を一括表示する ▼
+          </button>
+        </div>
+
+        <!-- 男女で横に並べる（種目と記録）＋ 詳細ボタン -->
+        <div class="records-side-by-side">
+          <!-- 左列：男子記録 -->
+          <div class="records-column">
+            <div class="records-col-header">男子 滋賀大記録</div>
+            <table class="records-compact-table">
+              <thead>
+                <tr>
+                  <th>種目</th>
+                  <th>記録</th>
+                  <th style="text-align: right;">詳細</th>
+                </tr>
+              </thead>
+              <tbody id="records-men-tbody">
+                <!-- app.js が自動生成します -->
+              </tbody>
+            </table>
+          </div>
+
+          <!-- 右列：女子記録 -->
+          <div class="records-column">
+            <div class="records-col-header">女子 滋賀大記録</div>
+            <table class="records-compact-table">
+              <thead>
+                <tr>
+                  <th>種目</th>
+                  <th>記録</th>
+                  <th style="text-align: right;">詳細</th>
+                </tr>
+              </thead>
+              <tbody id="records-women-tbody">
+                <!-- app.js が自動生成します -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- ==================== フッター（コピーライト） ==================== -->
+  <footer class="site-footer">
+    <div class="container">
+      <p>&copy; Shiga University Track and Field Club. All Rights Reserved.</p>
+    </div>
+  </footer>
+
+  <!-- ==================== スマホ表示プレビュー確認ボタン ==================== -->
+  <button id="mobile-preview-btn" class="mobile-preview-fab" title="スマホでの見え方を確認します">
+    📱 スマホ表示で見る
+  </button>
+  <div id="mobile-preview-modal" class="mobile-preview-modal" aria-hidden="true">
+    <div class="mobile-preview-toolbar">
+      <span>📱 スマホ版プレビュー</span>
+      <button id="mobile-preview-close" class="mobile-preview-close">✕ PC表示に戻る</button>
+    </div>
+    <div class="mobile-device-frame">
+      <iframe id="mobile-preview-iframe" title="スマホ表示プレビュー"></iframe>
+    </div>
+  </div>
+
+  <script src="data.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
+

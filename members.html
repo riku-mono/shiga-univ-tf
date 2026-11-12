@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>部員紹介｜滋賀大学陸上競技部</title>
+  <meta name="description" content="滋賀大学陸上競技部の部員紹介ページです。1〜4回生・大学院生の名前（カナ・漢字）、出身高校、学部、種目と自己ベスト（PB）、一言を掲載しています。" />
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+  <!-- ==================== ヘッダー ==================== -->
+  <header class="site-header">
+    <div class="container header-inner">
+      <a href="index.html" class="site-logo">
+        <span class="site-logo-sub">SHIGA UNIVERSITY TRACK &amp; FIELD</span>
+        <span class="site-logo-main">滋賀大学陸上競技部</span>
+      </a>
+      <button id="menu-toggle" class="menu-toggle" aria-label="メニューを開く">メニュー ☰</button>
+      <nav id="main-nav" class="main-nav">
+        <ul>
+          <li><a href="index.html">ホーム</a></li>
+          <li><a href="index.html#news">お知らせ</a></li>
+          <li><a href="records.html">滋賀大記録</a></li>
+          <li><a href="recruit.html">新入生の方へ</a></li>
+          <li><a href="members.html" class="active">部員紹介</a></li>
+          <li><a href="index.html#faq">よくある質問</a></li>
+          <li><a href="index.html#contact">お問い合わせ</a></li>
+        </ul>
+      </nav>
+    </div>
+  </header>
+
+  <main>
+    <!-- ページ見出し -->
+    <div class="subpage-header">
+      <div class="container">
+        <h1>部員紹介</h1>
+        <p>1〜4回生・大学院生プロフィール（名前・出身高校・学部・種目とPB・一言）</p>
+      </div>
+    </div>
+    <div class="breadcrumb">
+      <div class="container">
+        <a href="index.html">ホーム</a> &gt; 部員紹介
+      </div>
+    </div>
+
+    <section class="section">
+      <div class="container">
+        <div class="filter-bar">
+          <button type="button" class="tab-btn active" data-member-filter="all">全員</button>
+          <button type="button" class="tab-btn" data-member-filter="1回生">1回生</button>
+          <button type="button" class="tab-btn" data-member-filter="2回生">2回生</button>
+          <button type="button" class="tab-btn" data-member-filter="3回生">3回生</button>
+          <button type="button" class="tab-btn" data-member-filter="4回生">4回生</button>
+          <button type="button" class="tab-btn" data-member-filter="大学院生">大学院生</button>
+        </div>
+
+        <div id="members-grid" class="members-grid">
+          <!-- app.js がスプレッドシートまたは data.js から自動生成します -->
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- ==================== フッター（コピーライト） ==================== -->
+  <footer class="site-footer">
+    <div class="container">
+      <p>&copy; Shiga University Track and Field Club. All Rights Reserved.</p>
+    </div>
+  </footer>
+
+  <!-- ==================== スマホ表示プレビュー確認ボタン ==================== -->
+  <button id="mobile-preview-btn" class="mobile-preview-fab" title="スマホでの見え方を確認します">
+    📱 スマホ表示で見る
+  </button>
+  <div id="mobile-preview-modal" class="mobile-preview-modal" aria-hidden="true">
+    <div class="mobile-preview-toolbar">
+      <span>📱 スマホ版プレビュー</span>
+      <button id="mobile-preview-close" class="mobile-preview-close">✕ PC表示に戻る</button>
+    </div>
+    <div class="mobile-device-frame">
+      <iframe id="mobile-preview-iframe" title="スマホ表示プレビュー"></iframe>
+    </div>
+  </div>
+
+  <script src="data.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
+
