@@ -12,11 +12,38 @@
 
 document.addEventListener("DOMContentLoaded", () => {
   // --------------------------------------------------------------------------
-  // 1. スマホ版 開閉式メニュー (Header)
+  // 1. スマホ版 開閉式メニュー (Header) ＆ ページ内スクロール位置調整（色の別れ目に合わせる）
   // --------------------------------------------------------------------------
+  const siteHeader = document.querySelector(".site-header");
   const menuBtn = document.getElementById("menu-btn");
   const menuBtnIcon = document.getElementById("menu-btn-icon");
   const headerNav = document.getElementById("header-nav");
+
+  function getHeaderHeight() {
+    return siteHeader ? Math.ceil(siteHeader.getBoundingClientRect().height) : 100;
+  }
+
+  function syncHeaderHeightVar() {
+    document.documentElement.style.setProperty("--header-height", `${getHeaderHeight()}px`);
+  }
+
+  syncHeaderHeightVar();
+  window.addEventListener("resize", syncHeaderHeightVar);
+
+  function scrollToSectionBoundary(hash, smooth = true) {
+    if (!hash || hash === "#") return false;
+    const id = decodeURIComponent(hash.replace(/^#/, ""));
+    const targetEl = document.getElementById(id);
+    if (!targetEl) return false;
+
+    const headerH = getHeaderHeight();
+    const targetTop = targetEl.getBoundingClientRect().top + window.scrollY - headerH;
+    window.scrollTo({
+      top: Math.max(0, targetTop),
+      behavior: smooth ? "smooth" : "auto"
+    });
+    return true;
+  }
 
   if (menuBtn && headerNav) {
     menuBtn.addEventListener("click", () => {
@@ -36,6 +63,33 @@ document.addEventListener("DOMContentLoaded", () => {
         }
       });
     });
+  }
+
+  // 同一ページ内のアンカーリンク押下時、上のセクターとの色の別れ目（ヘッダー直下）へ移動
+  document.querySelectorAll('a[href*="#"]').forEach((anchor) => {
+    anchor.addEventListener("click", (e) => {
+      const href = anchor.getAttribute("href") || "";
+      if (href === "#") return;
+
+      const url = new URL(href, window.location.href);
+      const isSamePage =
+        url.pathname === window.location.pathname ||
+        url.pathname.replace(/\/index\.html$/, "/") === window.location.pathname.replace(/\/index\.html$/, "/");
+
+      if (isSamePage && url.hash) {
+        if (scrollToSectionBoundary(url.hash, true)) {
+          e.preventDefault();
+          history.pushState(null, "", url.hash);
+        }
+      }
+    });
+  });
+
+  // 別ページからハッシュ付き（例: recruit.html#practice, index.html#faq）で遷移してきた場合の位置補正
+  if (window.location.hash) {
+    setTimeout(() => {
+      scrollToSectionBoundary(window.location.hash, false);
+    }, 30);
   }
 
   // --------------------------------------------------------------------------
