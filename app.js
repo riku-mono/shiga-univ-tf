@@ -477,6 +477,231 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   // --------------------------------------------------------------------------
+  // 5.5 Googleスプレッドシート（CSV公開URL）からの自動データ同期
+  // --------------------------------------------------------------------------
+  function parseCsv(text) {
+    const rows = [];
+    let current = [];
+    let cell = "";
+    let inQuotes = false;
+
+    for (let i = 0; i < text.length; i++) {
+      const ch = text[i];
+      const next = text[i + 1];
+
+      if (inQuotes) {
+        if (ch === '"' && next === '"') {
+          cell += '"';
+          i++;
+        } else if (ch === '"') {
+          inQuotes = false;
+        } else {
+          cell += ch;
+        }
+      } else {
+        if (ch === '"') {
+          inQuotes = true;
+        } else if (ch === ",") {
+          current.push(cell.trim());
+          cell = "";
+        } else if (ch === "\n" || (ch === "\r" && next === "\n")) {
+          if (ch === "\r") i++;
+          current.push(cell.trim());
+          if (current.some((v) => v !== "")) {
+            rows.push(current);
+          }
+          current = [];
+          cell = "";
+        } else {
+          cell += ch;
+        }
+      }
+    }
+    current.push(cell.trim());
+    if (current.some((v) => v !== "")) {
+      rows.push(current);
+    }
+
+    if (rows.length < 2) return [];
+    const headers = rows[0].map((h) => h.replace(/^\uFEFF/, "").trim());
+    return rows.slice(1).map((r) => {
+      const obj = {};
+      headers.forEach((h, idx) => {
+        obj[h] = r[idx] !== undefined ? r[idx] : "";
+      });
+      return obj;
+    });
+  }
+
+  function getCurrentAcademicYear() {
+    if (typeof SITE_DATA !== "undefined" && SITE_DATA.googleSheetConfig && SITE_DATA.googleSheetConfig.currentAcademicYear) {
+      return Number(SITE_DATA.googleSheetConfig.currentAcademicYear);
+    }
+    const now = new Date();
+    const year = now.getFullYear();
+    const month = now.getMonth() + 1; // 1〜3月は前年度扱い
+    return month >= 4 ? year : year - 1;
+  }
+
+  async function syncFromGoogleSheets() {
+    if (typeof SITE_DATA === "undefined" || !SITE_DATA.googleSheetConfig) return;
+    const sheetCfg = SITE_DATA.googleSheetConfig;
+
+    // ① お知らせシートの同期
+    const topNewsListEl = document.getElementById("top-news-list");
+    if (sheetCfg.newsCsvUrl && topNewsListEl) {
+      try {
+        const res = await fetch(sheetCfg.newsCsvUrl, { cache: "no-store" });
+        if (res.ok) {
+          const items = parseCsv(await res.text());
+          if (items.length > 0) {
+            topNewsListEl.innerHTML = items
+              .map((row) => {
+                const cat = row["カテゴリ"] || row["category"] || "お知らせ";
+                const title = row["タイトル"] || row["title"] || "";
+                const status = row["状態・日付"] || row["statusText"] || "詳細を見る →";
+                const href = row["リンク先"] || row["href"] || "recruit.html";
+                return `
+                  <a href="${href}" class="news-row">
+                    <span class="news-cat">${cat}</span>
+                    <span class="news-title">${title}</span>
+                    <span class="news-status">${status}</span>
+                  </a>
+                `;
+              })
+              .join("");
+          }
+        }
+      } catch (e) {
+        console.warn("お知らせCSVの取得に失敗したため初期データを表示します:", e);
+      }
+    }
+
+    // ② 部員紹介シートの同期（入学年度から1〜4回生を自動計算、卒業生は自動除外）
+    if (sheetCfg.membersCsvUrl && membersCardsGrid) {
+      try {
+        const res = await fetch(sheetCfg.membersCsvUrl, { cache: "no-store" });
+        if (res.ok) {
+          const rows = parseCsv(await res.text());
+          if (rows.length > 0) {
+            const academicYear = getCurrentAcademicYear();
+            const grouped = {
+              "1回生": [],
+              "2回生": [],
+              "3回生": [],
+              "4回生": [],
+              "院生": []
+            };
+
+            rows.forEach((row) => {
+              const course = (row["課程・区分"] || row["区分"] || "学部").trim();
+              const admissionYear = Number(row["入学年度"] || row["admissionYear"] || 0);
+              let gradeKey = row["学年"] || "";
+
+              if (course.includes("院") || gradeKey.includes("院")) {
+                const gradDiff = admissionYear ? academicYear - admissionYear + 1 : 1;
+                if (gradDiff >= 1 && gradDiff <= 2) {
+                  gradeKey = "院生";
+                } else {
+                  return; // 修了生は自動非表示
+                }
+              } else if (admissionYear > 0) {
+                const gradeNum = academicYear - admissionYear + 1;
+                if (gradeNum >= 1 && gradeNum <= 4) {
+                  gradeKey = `${gradeNum}回生`;
+                } else {
+                  return; // 4回生を超えた卒業生は自動で非表示
+                }
+              }
+
+              if (!grouped[gradeKey]) return;
+
+              const idxNum = String(grouped[gradeKey].length + 1).padStart(2, "0");
+              const faculty = row["学部・研究科"] || row["学部"] || "";
+              const displayGrade = gradeKey === "院生" ? "大学院生" : gradeKey;
+              const specialty = row["専門種目"] || row["種目"] || "";
+              const rawComment = row["一言"] || row["コメント"] || "";
+              const formattedComment =
+                rawComment && !rawComment.startsWith("「") ? `「${rawComment}」` : rawComment;
+
+              grouped[gradeKey].push({
+                num: idxNum,
+                eventTag: row["見出し種目"] || specialty || "TRACK & FIELD",
+                kana: row["フリガナ"] || row["カナ"] || "",
+                name: row["氏名"] || row["名前"] || "",
+                facultyGrade: faculty ? `${faculty}  /  ${displayGrade}` : displayGrade,
+                highSchool: row["出身高校"] || "—",
+                specialty: specialty || "—",
+                pb: row["自己ベスト"] || row["PB"] || "—",
+                comment: formattedComment
+              });
+            });
+
+            SITE_DATA.membersByGrade = grouped;
+            const activeTab = document.querySelector(".grade-tab.is-active");
+            const activeGrade = (activeTab && activeTab.getAttribute("data-grade-tab")) || "1回生";
+            renderMembersForGrade(activeGrade);
+          }
+        }
+      } catch (e) {
+        console.warn("部員紹介CSVの取得に失敗したため初期データを表示します:", e);
+      }
+    }
+
+    // ③ 滋賀大記録シートの同期
+    if (sheetCfg.recordsCsvUrl && recordsMenList && recordsWomenList) {
+      try {
+        const res = await fetch(sheetCfg.recordsCsvUrl, { cache: "no-store" });
+        if (res.ok) {
+          const rows = parseCsv(await res.text());
+          if (rows.length > 0) {
+            const catMap = {
+              トラック: "track",
+              track: "track",
+              フィールド: "field",
+              field: "field",
+              "ロード・競歩": "road",
+              road: "road",
+              混成: "combined",
+              combined: "combined"
+            };
+
+            const nextRecords = {
+              track: { label: "トラック種目", men: [], women: [] },
+              field: { label: "フィールド種目", men: [], women: [] },
+              road: { label: "ロード・競歩種目", men: [], women: [] },
+              combined: { label: "混成・その他種目", men: [], women: [] }
+            };
+
+            rows.forEach((row) => {
+              const rawCat = (row["カテゴリ"] || "トラック").trim();
+              const catKey = catMap[rawCat] || "track";
+              const gender = (row["性別"] || "男子").trim();
+              const targetArr = gender.includes("女") ? nextRecords[catKey].women : nextRecords[catKey].men;
+
+              targetArr.push({
+                event: row["種目"] || "",
+                record: row["記録"] || "",
+                holder: row["記録保持者"] || "",
+                date: row["達成日"] || "",
+                tournament: row["大会"] || "",
+                place: row["会場"] || ""
+              });
+            });
+
+            SITE_DATA.recordsByCategory = nextRecords;
+            renderRecordsCategory(currentRecordCategory);
+          }
+        }
+      } catch (e) {
+        console.warn("滋賀大記録CSVの取得に失敗したため初期データを表示します:", e);
+      }
+    }
+  }
+
+  syncFromGoogleSheets();
+
+  // --------------------------------------------------------------------------
   // 6. スマホ表示プレビュー機能（iPhone Dynamic Island / ノッチ / Safari実画面再現）
   // --------------------------------------------------------------------------
   const previewBtn = document.getElementById("mobile-preview-btn");
