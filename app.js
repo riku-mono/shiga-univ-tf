@@ -286,6 +286,11 @@ document.addEventListener("DOMContentLoaded", () => {
       membersGradeHeading.textContent = gradeKey === "院生" ? "大学院生（院生）" : gradeKey;
     }
 
+    if (list.length === 0) {
+      membersCardsGrid.innerHTML = `<p class="records-empty-msg">現在この学年の部員データは登録されていません。</p>`;
+      return;
+    }
+
     membersCardsGrid.innerHTML = list
       .map(
         (m) => `
