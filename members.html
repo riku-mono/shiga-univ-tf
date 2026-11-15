@@ -8,10 +8,15 @@
   <title>部員紹介｜滋賀大学陸上競技部</title>
   <meta name="description"
     content="滋賀大学陸上競技部の部員紹介ページです。1〜4回生・大学院生のプロフィール（種目・氏名・学部・出身高校・自己ベスト・一言）を掲載しています。" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link rel="stylesheet"
+    href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&family=Noto+Sans+JP:wght@400;500;700;900&display=swap" />
   <link rel="stylesheet" href="style.css" />
 </head>
 
 <body>
+  <a href="#main-content" class="skip-link">メインコンテンツへ移動</a>
   <div class="page-wrapper" data-node-id="19:82">
 
     <!-- ==================== Header (19:83 PC / 19:103 SP) ==================== -->
@@ -23,13 +28,13 @@
         </a>
 
         <!-- スマホ用メニューボタン (19:107) -->
-        <button type="button" id="menu-btn" class="menu-btn" aria-expanded="false" aria-label="メニューを開閉">
-          <span class="menu-btn-icon" id="menu-btn-icon">☰</span>
-          <span class="menu-btn-label">MENU</span>
+        <button type="button" id="menu-btn" class="menu-btn" aria-expanded="false" aria-controls="header-nav" aria-label="メニューを開閉">
+          <span class="menu-btn-icon" id="menu-btn-icon" aria-hidden="true">☰</span>
+          <span class="menu-btn-label" aria-hidden="true">MENU</span>
         </button>
 
         <!-- ナビゲーション (19:87) -->
-        <nav id="header-nav" class="header-nav" data-node-id="19:87">
+        <nav id="header-nav" class="header-nav" aria-label="メインナビゲーション" data-node-id="19:87">
           <a href="index.html" data-node-id="19:88">ホーム</a>
           <div class="nav-dropdown">
             <a href="recruit.html" class="nav-dropdown-trigger" data-node-id="19:90">入部希望の方へ</a>
@@ -38,22 +43,22 @@
               <a href="recruit.html#greetings">主将・監督メッセージ</a>
             </div>
           </div>
-          <a href="members.html" data-node-id="19:91">部員一覧</a>
+          <a href="members.html" aria-current="page" data-node-id="19:91">部員一覧</a>
           <a href="index.html#faq" data-node-id="19:92">よくある質問</a>
           <a href="index.html#contact" data-node-id="19:93">お問い合わせ</a>
         </nav>
       </div>
     </header>
 
-    <main>
+    <main id="main-content" tabindex="-1">
       <!-- ==================== Intro (19:94 PC / 19:110 SP) ==================== -->
       <section class="subpage-section subpage-section--pale" data-node-id="19:94">
-        <p class="breadcrumb-line" data-node-id="19:466"><a href="index.html">ホーム</a>  /  部員紹介</p>
+        <nav class="breadcrumb-line" aria-label="パンくずリスト" data-node-id="19:466"><a href="index.html">ホーム</a>  /  部員紹介</nav>
         <p class="section-eyebrow" data-node-id="19:467">OUR MEMBERS</p>
 
         <h1 class="subpage-heading subpage-heading--large" data-node-id="19:468">
-          <p>それぞれの目標。</p>
-          <p>ひとつのチーム。</p>
+          <span class="heading-line">それぞれの目標。</span>
+          <span class="heading-line">ひとつのチーム。</span>
         </h1>
 
         <div class="subpage-lead" data-node-id="19:469">
@@ -66,36 +71,37 @@
       <section class="subpage-section subpage-section--white" data-node-id="19:95">
         <!-- 学年タブ (19:470 PC / 19:548 SP) -->
         <div class="grade-tabs" role="tablist" aria-label="学年切り替え" data-node-id="19:470">
-          <button type="button" class="grade-tab is-active" role="tab" aria-selected="true" data-grade-tab="1回生"
+          <button type="button" id="tab-grade-1" class="grade-tab is-active" role="tab" aria-selected="true" data-grade-tab="1回生"
             data-node-id="19:471">
             <span data-node-id="19:472">1回生</span>
           </button>
-          <button type="button" class="grade-tab" role="tab" aria-selected="false" data-grade-tab="2回生"
+          <button type="button" id="tab-grade-2" class="grade-tab" role="tab" aria-selected="false" tabindex="-1" data-grade-tab="2回生"
             data-node-id="19:473">
             <span data-node-id="19:474">2回生</span>
           </button>
-          <button type="button" class="grade-tab" role="tab" aria-selected="false" data-grade-tab="3回生"
+          <button type="button" id="tab-grade-3" class="grade-tab" role="tab" aria-selected="false" tabindex="-1" data-grade-tab="3回生"
             data-node-id="19:475">
             <span data-node-id="19:476">3回生</span>
           </button>
-          <button type="button" class="grade-tab" role="tab" aria-selected="false" data-grade-tab="4回生"
+          <button type="button" id="tab-grade-4" class="grade-tab" role="tab" aria-selected="false" tabindex="-1" data-grade-tab="4回生"
             data-node-id="19:477">
             <span data-node-id="19:478">4回生</span>
           </button>
-          <button type="button" class="grade-tab" role="tab" aria-selected="false" data-grade-tab="院生"
+          <button type="button" id="tab-grade-grad" class="grade-tab" role="tab" aria-selected="false" tabindex="-1" data-grade-tab="院生"
             data-node-id="19:479">
             <span data-node-id="19:480">院生</span>
           </button>
         </div>
 
-        <h2 id="members-grade-heading" class="subpage-sec-title" data-node-id="19:481">1回生</h2>
+        <div id="members-panel" class="tabs-panel-stack" role="tabpanel" aria-labelledby="tab-grade-1">
+          <h2 id="members-grade-heading" class="subpage-sec-title" data-node-id="19:481">1回生</h2>
 
-        <p class="members-disclaimer" data-node-id="19:482">
-          以下の氏名・高校・学部・PB・一言はすべて架空の掲載例です。実際の部員情報に差し替えて使用します。
-        </p>
+          <p class="members-disclaimer" data-node-id="19:482">
+            以下の氏名・高校・学部・PB・一言はすべて架空の掲載例です。実際の部員情報に差し替えて使用します。
+          </p>
 
-        <!-- 部員カード一覧（初期表示：1回生、タブ切り替え時にapp.jsが再描画） -->
-        <div id="members-cards-grid" class="members-cards-grid" data-node-id="19:483">
+          <!-- 部員カード一覧（初期表示：1回生、タブ切り替え時にapp.jsが再描画） -->
+          <div id="members-cards-grid" class="members-cards-grid" data-node-id="19:483">
           <!-- 01 山田 翔太 -->
           <article class="member-card" data-node-id="19:484">
             <div class="member-card-top" data-node-id="19:485">
@@ -176,6 +182,7 @@
             <p class="member-comment" data-node-id="19:540">「自分らしく、全力で！」</p>
           </article>
         </div>
+        </div>
       </section>
 
       <!-- ==================== Team Invitation (19:96 PC / 19:112 SP) ==================== -->
@@ -199,18 +206,18 @@
   </div>
 
   <!-- ==================== スマホ表示プレビュー確認ボタン ==================== -->
-  <button id="mobile-preview-btn" class="mobile-preview-fab" title="スマホ版（390px幅）での見え方を確認します">
-    📱 スマホ表示で見る
+  <button type="button" id="mobile-preview-btn" class="mobile-preview-fab" title="スマホ版（iPhone実画面サイズ）での見え方を確認します">
+    <span aria-hidden="true">📱</span> スマホ表示で見る
   </button>
-  <div id="mobile-preview-modal" class="mobile-preview-modal" aria-hidden="true">
+  <dialog id="mobile-preview-modal" class="mobile-preview-modal" aria-label="スマホ表示プレビュー" closedby="any">
     <div class="mobile-preview-toolbar">
       <span>📱 スマホ版プレビュー（390px幅）</span>
-      <button id="mobile-preview-close" class="mobile-preview-close">✕ PC表示に戻る</button>
+      <button type="button" id="mobile-preview-close" class="mobile-preview-close">✕ PC表示に戻る</button>
     </div>
     <div class="mobile-device-frame">
       <iframe id="mobile-preview-iframe" title="スマホ表示プレビュー"></iframe>
     </div>
-  </div>
+  </dialog>
 
   <script src="data.js"></script>
   <script src="app.js"></script>

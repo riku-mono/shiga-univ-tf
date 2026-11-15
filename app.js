@@ -36,13 +36,27 @@ document.addEventListener("DOMContentLoaded", () => {
     const targetEl = document.getElementById(id);
     if (!targetEl) return false;
 
+    const prefersReducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
     const headerH = getHeaderHeight();
     const targetTop = targetEl.getBoundingClientRect().top + window.scrollY - headerH;
     window.scrollTo({
       top: Math.max(0, targetTop),
-      behavior: smooth ? "smooth" : "auto"
+      behavior: smooth && !prefersReducedMotion ? "smooth" : "auto"
     });
     return true;
+  }
+
+  function closeMobileMenu(restoreFocus = false) {
+    if (!menuBtn || !headerNav) return;
+    const wasOpen = headerNav.classList.contains("open");
+    headerNav.classList.remove("open");
+    menuBtn.setAttribute("aria-expanded", "false");
+    if (menuBtnIcon) {
+      menuBtnIcon.textContent = "☰";
+    }
+    if (restoreFocus && wasOpen) {
+      menuBtn.focus();
+    }
   }
 
   if (menuBtn && headerNav) {
@@ -55,13 +69,13 @@ document.addEventListener("DOMContentLoaded", () => {
     });
 
     headerNav.querySelectorAll("a").forEach((link) => {
-      link.addEventListener("click", () => {
-        headerNav.classList.remove("open");
-        menuBtn.setAttribute("aria-expanded", "false");
-        if (menuBtnIcon) {
-          menuBtnIcon.textContent = "☰";
-        }
-      });
+      link.addEventListener("click", () => closeMobileMenu(false));
+    });
+
+    document.addEventListener("keydown", (e) => {
+      if (e.key === "Escape" && headerNav.classList.contains("open")) {
+        closeMobileMenu(true);
+      }
     });
   }
 
@@ -93,22 +107,41 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   // --------------------------------------------------------------------------
-  // 2. FAQの開閉 (19:17 PC / 19:35 SP)
+  // 2. FAQの開閉 (19:17 PC / 19:35 SP) ＆ ページ内検索(beforematch)連動
   // --------------------------------------------------------------------------
   const faqBoxes = document.querySelectorAll("[data-faq-box]");
 
+  function setFaqState(box, open) {
+    const trigger = box.querySelector(".faq-trigger");
+    const answer = box.querySelector(".faq-answer");
+    box.classList.toggle("is-open", open);
+    if (trigger) {
+      trigger.setAttribute("aria-expanded", String(open));
+      const baseQ = trigger.getAttribute("data-faq-question") || "";
+      if (baseQ) {
+        trigger.textContent = `${baseQ}  ${open ? "−" : "＋"}`;
+      }
+    }
+    if (answer) {
+      answer.hidden = open ? false : "until-found";
+    }
+  }
+
   faqBoxes.forEach((box) => {
     const trigger = box.querySelector(".faq-trigger");
+    const answer = box.querySelector(".faq-answer");
     if (!trigger) return;
 
     trigger.addEventListener("click", () => {
-      const isOpen = box.classList.toggle("is-open");
-      trigger.setAttribute("aria-expanded", String(isOpen));
-      const baseQ = trigger.getAttribute("data-faq-question") || "";
-      if (baseQ) {
-        trigger.textContent = `${baseQ}  ${isOpen ? "−" : "＋"}`;
-      }
+      const nextOpen = !box.classList.contains("is-open");
+      setFaqState(box, nextOpen);
     });
+
+    if (answer) {
+      answer.addEventListener("beforematch", () => {
+        setFaqState(box, true);
+      });
+    }
   });
 
   // --------------------------------------------------------------------------
@@ -116,6 +149,7 @@ document.addEventListener("DOMContentLoaded", () => {
   // --------------------------------------------------------------------------
   const contactForm = document.getElementById("contact-form");
   const confirmView = document.getElementById("form-confirm-view");
+  const confirmHeading = document.getElementById("form-confirm-heading");
   const resultView = document.getElementById("form-result-view");
   const resultBanner = document.getElementById("form-result-banner");
 
@@ -137,55 +171,105 @@ document.addEventListener("DOMContentLoaded", () => {
   const btnSendFinal = document.getElementById("btn-send-final");
   const btnResetForm = document.getElementById("btn-reset-form");
 
+  // フォームエラー用 aria-describedby / aria-invalid / ライブリージョン同期
+  const formAnnouncer = document.createElement("div");
+  formAnnouncer.setAttribute("aria-live", "polite");
+  formAnnouncer.className = "visually-hidden";
+  document.body.append(formAnnouncer);
+  let formAnnounceTimer;
+
+  function linkFieldError(el, shown) {
+    if (!el) return;
+    const errorId = el.dataset.error;
+    if (!errorId) return;
+    const ids = (el.getAttribute("aria-describedby") || "")
+      .split(/\s+/)
+      .filter((id) => id && id !== errorId);
+    if (shown) ids.push(errorId);
+    if (ids.length) el.setAttribute("aria-describedby", ids.join(" "));
+    else el.removeAttribute("aria-describedby");
+  }
+
+  function setFieldErrorState(el, errorEl, isInvalid, announce = false) {
+    if (!el) return;
+    el.setAttribute("aria-invalid", isInvalid ? "true" : "false");
+    el.classList.toggle("has-error", isInvalid);
+    linkFieldError(el, isInvalid);
+    if (errorEl) {
+      errorEl.classList.toggle("visible", isInvalid);
+      if (isInvalid && announce) {
+        clearTimeout(formAnnounceTimer);
+        formAnnouncer.textContent = "";
+        formAnnounceTimer = setTimeout(() => {
+          formAnnouncer.textContent = errorEl.textContent.trim();
+        }, 350);
+      }
+    }
+  }
+
+  function validateSingleField(el) {
+    if (el === nameInput) {
+      return { valid: Boolean(nameInput.value.trim()), errorEl: errName };
+    }
+    if (el === emailInput) {
+      const emailVal = emailInput.value.trim();
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      return { valid: Boolean(emailVal && emailRegex.test(emailVal)), errorEl: errEmail };
+    }
+    if (el === messageInput) {
+      return { valid: Boolean(messageInput.value.trim()), errorEl: errMessage };
+    }
+    if (el === consentInput) {
+      return { valid: Boolean(consentInput.checked), errorEl: errConsent };
+    }
+    return { valid: true, errorEl: null };
+  }
+
   function validateForm() {
-    let valid = true;
+    const fields = [nameInput, emailInput, messageInput, consentInput].filter(Boolean);
+    let firstInvalid = null;
 
-    if (!nameInput.value.trim()) {
-      nameInput.classList.add("has-error");
-      errName.classList.add("visible");
-      valid = false;
-    } else {
-      nameInput.classList.remove("has-error");
-      errName.classList.remove("visible");
+    fields.forEach((field) => {
+      const { valid, errorEl } = validateSingleField(field);
+      setFieldErrorState(field, errorEl, !valid, false);
+      if (!valid && !firstInvalid) {
+        firstInvalid = field;
+      }
+    });
+
+    if (firstInvalid) {
+      firstInvalid.focus();
+      return false;
     }
-
-    const emailVal = emailInput.value.trim();
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!emailVal || !emailRegex.test(emailVal)) {
-      emailInput.classList.add("has-error");
-      errEmail.classList.add("visible");
-      valid = false;
-    } else {
-      emailInput.classList.remove("has-error");
-      errEmail.classList.remove("visible");
-    }
-
-    if (!messageInput.value.trim()) {
-      messageInput.classList.add("has-error");
-      errMessage.classList.add("visible");
-      valid = false;
-    } else {
-      messageInput.classList.remove("has-error");
-      errMessage.classList.remove("visible");
-    }
-
-    if (!consentInput.checked) {
-      errConsent.classList.add("visible");
-      valid = false;
-    } else {
-      errConsent.classList.remove("visible");
-    }
-
-    return valid;
+    return true;
   }
 
   if (contactForm && confirmView && resultView) {
     [nameInput, emailInput, messageInput].forEach((input) => {
       if (!input) return;
+      input.addEventListener("blur", () => {
+        const { valid, errorEl } = validateSingleField(input);
+        if (!valid || input.getAttribute("aria-invalid") === "true") {
+          setFieldErrorState(input, errorEl, !valid, !valid);
+        }
+      });
       input.addEventListener("input", () => {
+        if (input.getAttribute("aria-invalid") === "true") {
+          const { valid, errorEl } = validateSingleField(input);
+          if (valid) {
+            setFieldErrorState(input, errorEl, false, false);
+          }
+        }
         input.classList.remove("has-error");
       });
     });
+
+    if (consentInput) {
+      consentInput.addEventListener("change", () => {
+        const { valid, errorEl } = validateSingleField(consentInput);
+        setFieldErrorState(consentInput, errorEl, !valid, !valid);
+      });
+    }
 
     contactForm.addEventListener("submit", (e) => {
       e.preventDefault();
@@ -197,12 +281,14 @@ document.addEventListener("DOMContentLoaded", () => {
 
       contactForm.style.display = "none";
       confirmView.classList.add("active");
+      if (confirmHeading) confirmHeading.focus();
     });
 
     if (btnBackEdit) {
       btnBackEdit.addEventListener("click", () => {
         confirmView.classList.remove("active");
         contactForm.style.display = "flex";
+        if (nameInput) nameInput.focus();
       });
     }
 
@@ -258,6 +344,7 @@ document.addEventListener("DOMContentLoaded", () => {
           btnSendFinal.disabled = false;
           confirmView.classList.remove("active");
           resultView.classList.add("active");
+          if (resultBanner) resultBanner.focus();
         }
       });
     }
@@ -265,16 +352,82 @@ document.addEventListener("DOMContentLoaded", () => {
     if (btnResetForm) {
       btnResetForm.addEventListener("click", () => {
         contactForm.reset();
+        [nameInput, emailInput, messageInput, consentInput].forEach((el) => {
+          const { errorEl } = validateSingleField(el);
+          setFieldErrorState(el, errorEl, false, false);
+        });
         resultView.classList.remove("active");
         contactForm.style.display = "flex";
+        if (nameInput) nameInput.focus();
       });
     }
+  }
+
+  // --------------------------------------------------------------------------
+  // 共通ユーティリティ（HTMLエスケープ / URLサニタイズ / WAI-ARIAタブ制御）
+  // --------------------------------------------------------------------------
+  function escapeHtml(str) {
+    return String(str ?? "")
+      .replace(/&/g, "&amp;")
+      .replace(/</g, "&lt;")
+      .replace(/>/g, "&gt;")
+      .replace(/"/g, "&quot;")
+      .replace(/'/g, "&#39;");
+  }
+
+  function safeHref(rawUrl) {
+    const trimmed = String(rawUrl || "").trim();
+    if (!trimmed) return "recruit.html";
+    if (/^(https?:\/\/|\/|\.\/|[a-zA-Z0-9_-]+\.html(#.*)?$|#)/.test(trimmed)) {
+      return escapeHtml(trimmed);
+    }
+    return "recruit.html";
+  }
+
+  function setupTablist(tabs, panelEl, onSelect) {
+    if (!tabs || tabs.length === 0) return;
+
+    function activateTab(tab, moveFocus = false) {
+      tabs.forEach((t) => {
+        const active = t === tab;
+        t.classList.toggle("is-active", active);
+        t.setAttribute("aria-selected", String(active));
+        t.tabIndex = active ? 0 : -1;
+      });
+      if (panelEl && tab.id) {
+        panelEl.setAttribute("aria-labelledby", tab.id);
+      }
+      if (moveFocus) {
+        tab.focus();
+      }
+      if (typeof tab.scrollIntoView === "function") {
+        tab.scrollIntoView({ block: "nearest", inline: "nearest" });
+      }
+      onSelect(tab);
+    }
+
+    tabs.forEach((tab, index) => {
+      tab.addEventListener("click", () => activateTab(tab, false));
+      tab.addEventListener("keydown", (e) => {
+        let nextIndex = null;
+        if (e.key === "ArrowRight") nextIndex = (index + 1) % tabs.length;
+        else if (e.key === "ArrowLeft") nextIndex = (index - 1 + tabs.length) % tabs.length;
+        else if (e.key === "Home") nextIndex = 0;
+        else if (e.key === "End") nextIndex = tabs.length - 1;
+
+        if (nextIndex !== null) {
+          e.preventDefault();
+          activateTab(tabs[nextIndex], true);
+        }
+      });
+    });
   }
 
   // --------------------------------------------------------------------------
   // 4. 部員紹介ページ：1〜4回生・大学院生（院生）で切り替える (19:82 PC / 19:102 SP)
   // --------------------------------------------------------------------------
   const gradeTabs = document.querySelectorAll("[data-grade-tab]");
+  const membersPanel = document.getElementById("members-panel");
   const membersGradeHeading = document.getElementById("members-grade-heading");
   const membersCardsGrid = document.getElementById("members-cards-grid");
 
@@ -296,21 +449,21 @@ document.addEventListener("DOMContentLoaded", () => {
         (m) => `
         <article class="member-card">
           <div class="member-card-top">
-            <p class="member-event-tag">${m.eventTag}</p>
-            <p class="member-num">${m.num}</p>
+            <p class="member-event-tag">${escapeHtml(m.eventTag)}</p>
+            <p class="member-num">${escapeHtml(m.num)}</p>
           </div>
-          <p class="member-kana">${m.kana}</p>
-          <h3 class="member-name">${m.name}</h3>
-          <p class="member-faculty">${m.facultyGrade}</p>
+          <p class="member-kana">${escapeHtml(m.kana)}</p>
+          <h3 class="member-name">${escapeHtml(m.name)}</h3>
+          <p class="member-faculty">${escapeHtml(m.facultyGrade)}</p>
           <div class="member-details">
-            <p>出身高校   ${m.highSchool}</p>
-            <p>専門種目   ${m.specialty}</p>
+            <p>出身高校   ${escapeHtml(m.highSchool)}</p>
+            <p>専門種目   ${escapeHtml(m.specialty)}</p>
           </div>
           <div class="member-pb-box">
             <p class="member-pb-label">PERSONAL BEST</p>
-            <p class="member-pb-value">${m.pb}</p>
+            <p class="member-pb-value">${escapeHtml(m.pb)}</p>
           </div>
-          <p class="member-comment">${m.comment}</p>
+          <p class="member-comment">${escapeHtml(m.comment)}</p>
         </article>
       `
       )
@@ -318,18 +471,9 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   if (gradeTabs.length > 0 && membersCardsGrid) {
-    gradeTabs.forEach((tab) => {
-      tab.addEventListener("click", () => {
-        const gradeKey = tab.getAttribute("data-grade-tab") || "1回生";
-
-        gradeTabs.forEach((t) => {
-          const active = t === tab;
-          t.classList.toggle("is-active", active);
-          t.setAttribute("aria-selected", String(active));
-        });
-
-        renderMembersForGrade(gradeKey);
-      });
+    setupTablist(Array.from(gradeTabs), membersPanel, (tab) => {
+      const gradeKey = tab.getAttribute("data-grade-tab") || "1回生";
+      renderMembersForGrade(gradeKey);
     });
   }
 
@@ -337,6 +481,7 @@ document.addEventListener("DOMContentLoaded", () => {
   // 5. 滋賀大記録ページ：カテゴリ別切り替え ＆ 詳細表示 (19:118 PC / 19:138 SP)
   // --------------------------------------------------------------------------
   const recordCatTabs = document.querySelectorAll("[data-record-cat]");
+  const recordsPanel = document.getElementById("records-panel");
   const recordsCatHeading = document.getElementById("records-cat-heading");
   const recordsMenList = document.getElementById("records-men-list");
   const recordsWomenList = document.getElementById("records-women-list");
@@ -368,28 +513,30 @@ document.addEventListener("DOMContentLoaded", () => {
     if (!container) return;
 
     if (!items || items.length === 0) {
-      container.innerHTML = `<p class="records-empty-msg">現在このカテゴリの${genderLabel}記録データは登録されていません。</p>`;
+      container.innerHTML = `<p class="records-empty-msg">現在このカテゴリの${escapeHtml(genderLabel)}記録データは登録されていません。</p>`;
       return;
     }
 
     container.innerHTML = items
       .map((item, idx) => {
         const isFirstSelected = selectFirstByDefault && idx === 0;
+        const inlineId = `record-inline-${genderLabel === "男子" ? "m" : "w"}-${idx}`;
         return `
           <div class="record-item-wrap">
             <button type="button" class="record-row-btn${isFirstSelected ? " is-selected" : ""}"
-              data-gender="${genderLabel}"
+              data-gender="${escapeHtml(genderLabel)}"
               data-idx="${idx}"
+              aria-controls="${inlineId}"
               aria-expanded="${isFirstSelected ? "true" : "false"}">
-              <span class="record-row-event">${item.event}</span>
-              <span class="record-row-val">${item.record}</span>
-              <span class="record-row-plus">${isFirstSelected ? "−" : "＋"}</span>
+              <span class="record-row-event">${escapeHtml(item.event)}</span>
+              <span class="record-row-val">${escapeHtml(item.record)}</span>
+              <span class="record-row-plus" aria-hidden="true">${isFirstSelected ? "−" : "＋"}</span>
             </button>
-            <div class="record-inline-detail${isFirstSelected ? " is-open" : ""}">
-              <div class="record-inline-line"><span>記録保持者</span><strong>${item.holder || "—"}</strong></div>
-              <div class="record-inline-line"><span>達成日</span><span>${item.date || "—"}</span></div>
-              <div class="record-inline-line"><span>大会</span><span>${item.tournament || "—"}</span></div>
-              <div class="record-inline-line"><span>会場</span><span>${item.place || "—"}</span></div>
+            <div id="${inlineId}" class="record-inline-detail${isFirstSelected ? " is-open" : ""}">
+              <div class="record-inline-line"><span>記録保持者</span><strong>${escapeHtml(item.holder || "—")}</strong></div>
+              <div class="record-inline-line"><span>達成日</span><span>${escapeHtml(item.date || "—")}</span></div>
+              <div class="record-inline-line"><span>大会</span><span>${escapeHtml(item.tournament || "—")}</span></div>
+              <div class="record-inline-line"><span>会場</span><span>${escapeHtml(item.place || "—")}</span></div>
             </div>
           </div>
         `;
@@ -450,19 +597,12 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   }
 
-  if ( recordsMenList && recordsWomenList ) {
+  if (recordsMenList && recordsWomenList) {
     renderRecordsCategory(currentRecordCategory);
 
-    recordCatTabs.forEach((tab) => {
-      tab.addEventListener("click", () => {
-        const catKey = tab.getAttribute("data-record-cat") || "track";
-        recordCatTabs.forEach((t) => {
-          const active = t === tab;
-          t.classList.toggle("is-active", active);
-          t.setAttribute("aria-selected", String(active));
-        });
-        renderRecordsCategory(catKey);
-      });
+    setupTablist(Array.from(recordCatTabs), recordsPanel, (tab) => {
+      const catKey = tab.getAttribute("data-record-cat") || "track";
+      renderRecordsCategory(catKey);
     });
 
     if (detailCloseBtn && recordDetailCard) {
@@ -562,10 +702,10 @@ document.addEventListener("DOMContentLoaded", () => {
           if (items.length > 0) {
             topNewsListEl.innerHTML = items
               .map((row) => {
-                const cat = row["カテゴリ"] || row["category"] || "お知らせ";
-                const title = row["タイトル"] || row["title"] || "";
-                const status = row["状態・日付"] || row["statusText"] || "詳細を見る →";
-                const href = row["リンク先"] || row["href"] || "recruit.html";
+                const cat = escapeHtml(row["カテゴリ"] || row["category"] || "お知らせ");
+                const title = escapeHtml(row["タイトル"] || row["title"] || "");
+                const status = escapeHtml(row["状態・日付"] || row["statusText"] || "詳細を見る →");
+                const href = safeHref(row["リンク先"] || row["href"] || "recruit.html");
                 return `
                   <a href="${href}" class="news-row">
                     <span class="news-cat">${cat}</span>
@@ -817,7 +957,7 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     function fitDeviceToScreen() {
-      if (!deviceFrame || !iphoneStage || !previewModal.classList.contains("open")) return;
+      if (!deviceFrame || !iphoneStage || !previewModal.open) return;
       const stageRect = iphoneStage.getBoundingClientRect();
       const model = deviceFrame.getAttribute("data-model") || "iphone15";
       const naturalH = model === "iphonese" ? 767 : model === "iphone14" ? 868 : 876;
@@ -829,17 +969,30 @@ document.addEventListener("DOMContentLoaded", () => {
       deviceFrame.style.setProperty("--device-scale", scale.toFixed(3));
     }
 
-    window.addEventListener("resize", fitDeviceToScreen);
-
-    previewBtn.addEventListener("click", () => {
+    function openPreviewModal() {
       updateClock();
       const baseUrl = window.location.href.split("?")[0].split("#")[0];
       const hash = window.location.hash || "";
       previewIframe.setAttribute("src", `${baseUrl}?mobile_preview=1${hash}`);
-      previewModal.classList.add("open");
-      previewModal.setAttribute("aria-hidden", "false");
+      if (typeof previewModal.showModal === "function") {
+        if (!previewModal.open) previewModal.showModal();
+      } else {
+        previewModal.setAttribute("open", "");
+      }
       requestAnimationFrame(fitDeviceToScreen);
-    });
+    }
+
+    function closePreviewModal() {
+      if (typeof previewModal.close === "function") {
+        if (previewModal.open) previewModal.close();
+      } else {
+        previewModal.removeAttribute("open");
+      }
+    }
+
+    window.addEventListener("resize", fitDeviceToScreen);
+
+    previewBtn.addEventListener("click", openPreviewModal);
 
     if (previewIframe && addressText) {
       previewIframe.addEventListener("load", () => {
@@ -879,16 +1032,12 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     if (previewClose) {
-      previewClose.addEventListener("click", () => {
-        previewModal.classList.remove("open");
-        previewModal.setAttribute("aria-hidden", "true");
-      });
+      previewClose.addEventListener("click", closePreviewModal);
     }
 
     previewModal.addEventListener("click", (e) => {
       if (e.target === previewModal || e.target === iphoneStage) {
-        previewModal.classList.remove("open");
-        previewModal.setAttribute("aria-hidden", "true");
+        closePreviewModal();
       }
     });
   }

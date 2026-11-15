@@ -7,10 +7,15 @@
   <meta name="theme-color" content="#00539b" />
   <title>新入生向けの情報｜滋賀大学陸上競技部</title>
   <meta name="description" content="滋賀大学陸上競技部の新入生向け案内ページです。彦根キャンパス・大津キャンパスの練習時間・場所、練習見学・体験練習、主将・監督からのメッセージを掲載しています。" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link rel="stylesheet"
+    href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&family=Noto+Sans+JP:wght@400;500;700;900&display=swap" />
   <link rel="stylesheet" href="style.css" />
 </head>
 
 <body>
+  <a href="#main-content" class="skip-link">メインコンテンツへ移動</a>
   <div class="page-wrapper" data-node-id="19:42">
 
     <!-- ==================== Header (19:43 PC / 19:65 SP) ==================== -->
@@ -22,16 +27,16 @@
         </a>
 
         <!-- スマホ用メニューボタン (19:69) -->
-        <button type="button" id="menu-btn" class="menu-btn" aria-expanded="false" aria-label="メニューを開閉">
-          <span class="menu-btn-icon" id="menu-btn-icon">☰</span>
-          <span class="menu-btn-label">MENU</span>
+        <button type="button" id="menu-btn" class="menu-btn" aria-expanded="false" aria-controls="header-nav" aria-label="メニューを開閉">
+          <span class="menu-btn-icon" id="menu-btn-icon" aria-hidden="true">☰</span>
+          <span class="menu-btn-label" aria-hidden="true">MENU</span>
         </button>
 
         <!-- ナビゲーション (19:47) -->
-        <nav id="header-nav" class="header-nav" data-node-id="19:47">
+        <nav id="header-nav" class="header-nav" aria-label="メインナビゲーション" data-node-id="19:47">
           <a href="index.html" data-node-id="19:48">ホーム</a>
           <div class="nav-dropdown">
-            <a href="recruit.html" class="nav-dropdown-trigger" data-node-id="19:50">入部希望の方へ</a>
+            <a href="recruit.html" class="nav-dropdown-trigger" aria-current="page" data-node-id="19:50">入部希望の方へ</a>
             <div class="nav-dropdown-menu" aria-label="入部希望の方へ サブメニュー">
               <a href="#practice">活動時間・場所</a>
               <a href="#greetings">主将・監督メッセージ</a>
@@ -44,15 +49,15 @@
       </div>
     </header>
 
-    <main>
+    <main id="main-content" tabindex="-1">
       <!-- ==================== Intro (19:54 PC / 19:72 SP) ==================== -->
       <section class="subpage-section subpage-section--pale" data-node-id="19:54">
-        <p class="breadcrumb-line" data-node-id="19:330"><a href="index.html">ホーム</a> / 新入生向けの情報</p>
+        <nav class="breadcrumb-line" aria-label="パンくずリスト" data-node-id="19:330"><a href="index.html">ホーム</a> / 新入生向けの情報</nav>
         <p class="section-eyebrow" data-node-id="19:331">FOR NEW MEMBERS</p>
 
         <h1 class="subpage-heading subpage-heading--recruit" data-node-id="19:332">
-          <p>大学生活に、</p>
-          <p>本気になれる時間を。</p>
+          <span class="heading-line">大学生活に、</span>
+          <span class="heading-line">本気になれる時間を。</span>
         </h1>
 
         <div class="subpage-lead" data-node-id="19:333">
@@ -63,7 +68,7 @@
         <div class="recruit-hero-img-wrap" data-node-id="19:334">
           <picture>
             <source media="(max-width: 768px)" srcset="assets/recruit-intro-sp.png" />
-            <img src="assets/recruit-intro-pc.png" alt="仲間と過ごす練習時間（イメージ）" />
+            <img src="assets/recruit-intro-pc.png" alt="仲間と過ごす練習時間（イメージ）" fetchpriority="high" decoding="async" />
           </picture>
         </div>
 
@@ -219,18 +224,18 @@
   </div>
 
   <!-- ==================== スマホ表示プレビュー確認ボタン ==================== -->
-  <button id="mobile-preview-btn" class="mobile-preview-fab" title="スマホ版（390px幅）での見え方を確認します">
-    📱 スマホ表示で見る
+  <button type="button" id="mobile-preview-btn" class="mobile-preview-fab" title="スマホ版（iPhone実画面サイズ）での見え方を確認します">
+    <span aria-hidden="true">📱</span> スマホ表示で見る
   </button>
-  <div id="mobile-preview-modal" class="mobile-preview-modal" aria-hidden="true">
+  <dialog id="mobile-preview-modal" class="mobile-preview-modal" aria-label="スマホ表示プレビュー" closedby="any">
     <div class="mobile-preview-toolbar">
       <span>📱 スマホ版プレビュー（390px幅）</span>
-      <button id="mobile-preview-close" class="mobile-preview-close">✕ PC表示に戻る</button>
+      <button type="button" id="mobile-preview-close" class="mobile-preview-close">✕ PC表示に戻る</button>
     </div>
     <div class="mobile-device-frame">
       <iframe id="mobile-preview-iframe" title="スマホ表示プレビュー"></iframe>
     </div>
-  </div>
+  </dialog>
 
   <script src="data.js"></script>
   <script src="app.js"></script>

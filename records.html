@@ -8,10 +8,15 @@
   <title>滋賀大記録｜滋賀大学陸上競技部</title>
   <meta name="description"
     content="滋賀大学陸上競技部の滋賀大記録（歴代記録）ページです。トラック、フィールド、ロード・競歩、混成の各カテゴリ別に男子・女子の記録と保持者・達成日・大会・会場を掲載しています。" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link rel="stylesheet"
+    href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&family=Noto+Sans+JP:wght@400;500;700;900&display=swap" />
   <link rel="stylesheet" href="style.css" />
 </head>
 
 <body>
+  <a href="#main-content" class="skip-link">メインコンテンツへ移動</a>
   <div class="page-wrapper" data-node-id="19:118">
 
     <!-- ==================== Header (19:119 PC / 19:139 SP) ==================== -->
@@ -23,13 +28,13 @@
         </a>
 
         <!-- スマホ用メニューボタン (19:143) -->
-        <button type="button" id="menu-btn" class="menu-btn" aria-expanded="false" aria-label="メニューを開閉">
-          <span class="menu-btn-icon" id="menu-btn-icon">☰</span>
-          <span class="menu-btn-label">MENU</span>
+        <button type="button" id="menu-btn" class="menu-btn" aria-expanded="false" aria-controls="header-nav" aria-label="メニューを開閉">
+          <span class="menu-btn-icon" id="menu-btn-icon" aria-hidden="true">☰</span>
+          <span class="menu-btn-label" aria-hidden="true">MENU</span>
         </button>
 
         <!-- ナビゲーション (19:123) -->
-        <nav id="header-nav" class="header-nav" data-node-id="19:123">
+        <nav id="header-nav" class="header-nav" aria-label="メインナビゲーション" data-node-id="19:123">
           <a href="index.html" data-node-id="19:124">ホーム</a>
           <div class="nav-dropdown">
             <a href="recruit.html" class="nav-dropdown-trigger" data-node-id="19:126">入部希望の方へ</a>
@@ -45,15 +50,15 @@
       </div>
     </header>
 
-    <main>
+    <main id="main-content" tabindex="-1">
       <!-- ==================== Intro (19:130 PC / 19:146 SP) ==================== -->
       <section class="subpage-section subpage-section--pale" data-node-id="19:130">
-        <p class="breadcrumb-line" data-node-id="19:624"><a href="index.html">ホーム</a>  /  滋賀大記録</p>
+        <nav class="breadcrumb-line" aria-label="パンくずリスト" data-node-id="19:624"><a href="index.html">ホーム</a>  /  滋賀大記録</nav>
         <p class="section-eyebrow" data-node-id="19:625">UNIVERSITY RECORDS</p>
 
         <h1 class="subpage-heading subpage-heading--large" data-node-id="19:626">
-          <p>挑戦をつなぐ、</p>
-          <p>滋賀大記録。</p>
+          <span class="heading-line">挑戦をつなぐ、</span>
+          <span class="heading-line">滋賀大記録。</span>
         </h1>
 
         <div class="subpage-lead" data-node-id="19:627">
@@ -66,24 +71,25 @@
       <section class="subpage-section subpage-section--white" data-node-id="19:131">
         <!-- 種目カテゴリー切り替えタブ (19:628 PC / 19:772 SP) -->
         <div class="record-cat-tabs" role="tablist" aria-label="種目カテゴリー切り替え" data-node-id="19:628">
-          <button type="button" class="record-cat-tab is-active" role="tab" aria-selected="true"
+          <button type="button" id="tab-record-track" class="record-cat-tab is-active" role="tab" aria-selected="true"
             data-record-cat="track" data-node-id="19:629">
             <span data-node-id="19:630">トラック</span>
           </button>
-          <button type="button" class="record-cat-tab" role="tab" aria-selected="false" data-record-cat="field"
+          <button type="button" id="tab-record-field" class="record-cat-tab" role="tab" aria-selected="false" tabindex="-1" data-record-cat="field"
             data-node-id="19:631">
             <span data-node-id="19:632">フィールド</span>
           </button>
-          <button type="button" class="record-cat-tab" role="tab" aria-selected="false" data-record-cat="road"
+          <button type="button" id="tab-record-road" class="record-cat-tab" role="tab" aria-selected="false" tabindex="-1" data-record-cat="road"
             data-node-id="19:633">
             <span data-node-id="19:634">ロード・競歩</span>
           </button>
-          <button type="button" class="record-cat-tab" role="tab" aria-selected="false" data-record-cat="combined"
+          <button type="button" id="tab-record-combined" class="record-cat-tab" role="tab" aria-selected="false" tabindex="-1" data-record-cat="combined"
             data-node-id="19:635">
             <span data-node-id="19:636">混成</span>
           </button>
         </div>
 
+        <div id="records-panel" class="tabs-panel-stack" role="tabpanel" aria-labelledby="tab-record-track">
         <h2 id="records-cat-heading" class="records-cat-heading" data-node-id="19:637">トラック種目</h2>
 
         <p class="records-layout-note records-layout-note--pc" data-node-id="19:638">
@@ -134,6 +140,7 @@
         <p class="subpage-footnote" data-node-id="19:749">
           ※ この画面はトラック種目の表示案です。その他の種目は各カテゴリに掲載します。
         </p>
+        </div>
       </section>
 
       <!-- ==================== Record Detail (19:132 PC / 19:148 SP) ==================== -->
@@ -188,18 +195,18 @@
   </div>
 
   <!-- ==================== スマホ表示プレビュー確認ボタン ==================== -->
-  <button id="mobile-preview-btn" class="mobile-preview-fab" title="スマホ版（390px幅）での見え方を確認します">
-    📱 スマホ表示で見る
+  <button type="button" id="mobile-preview-btn" class="mobile-preview-fab" title="スマホ版（iPhone実画面サイズ）での見え方を確認します">
+    <span aria-hidden="true">📱</span> スマホ表示で見る
   </button>
-  <div id="mobile-preview-modal" class="mobile-preview-modal" aria-hidden="true">
+  <dialog id="mobile-preview-modal" class="mobile-preview-modal" aria-label="スマホ表示プレビュー" closedby="any">
     <div class="mobile-preview-toolbar">
       <span>📱 スマホ版プレビュー（390px幅）</span>
-      <button id="mobile-preview-close" class="mobile-preview-close">✕ PC表示に戻る</button>
+      <button type="button" id="mobile-preview-close" class="mobile-preview-close">✕ PC表示に戻る</button>
     </div>
     <div class="mobile-device-frame">
       <iframe id="mobile-preview-iframe" title="スマホ表示プレビュー"></iframe>
     </div>
-  </div>
+  </dialog>
 
   <script src="data.js"></script>
   <script src="app.js"></script>
