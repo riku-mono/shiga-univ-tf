@@ -481,6 +481,23 @@ document.addEventListener("DOMContentLoaded", () => {
     return items;
   }
 
+  function resolveMemberRole(rawRole) {
+    const text = String(rawRole || "").trim();
+    if (!text) {
+      return { label: "選手", isManager: false };
+    }
+    const normalized = text.toLowerCase();
+    if (
+      text.includes("マネ") ||
+      normalized === "mg" ||
+      normalized === "mgr" ||
+      normalized.includes("manager")
+    ) {
+      return { label: "マネージャー", isManager: true };
+    }
+    return { label: text, isManager: false };
+  }
+
   function renderMembersForGrade(gradeKey) {
     if (!membersCardsGrid || typeof SITE_DATA === "undefined" || !SITE_DATA.membersByGrade) return;
 
@@ -496,26 +513,42 @@ document.addEventListener("DOMContentLoaded", () => {
 
     membersCardsGrid.innerHTML = list
       .map((m) => {
-        const pbItems =
-          Array.isArray(m.pbList) && m.pbList.length > 0
-            ? m.pbList
-            : parseMemberPbs(m.pb, m.fallbackEvent || m.eventTag);
+        const roleInfo = resolveMemberRole(m.role);
+        const pbItems = Array.isArray(m.pbList)
+          ? m.pbList
+          : parseMemberPbs(m.pb, m.fallbackEvent || m.eventTag);
 
-        const pbRowsHtml = pbItems
-          .map(
-            (item) => `
+        const pbBoxHtml =
+          pbItems.length > 0
+            ? `
+          <div class="member-pb-box">
+            <p class="member-pb-label">PERSONAL BEST</p>
+            <dl class="member-pb-list">
+              ${pbItems
+                .map(
+                  (item) => `
               <div class="member-pb-item">
                 ${item.event ? `<dt class="member-pb-event">${escapeHtml(item.event)}</dt>` : ""}
                 <dd class="member-pb-value">${escapeHtml(item.value)}</dd>
               </div>
             `
-          )
-          .join("");
+                )
+                .join("")}
+            </dl>
+          </div>`
+            : "";
+
+        const eventTagHtml = m.eventTag
+          ? `<p class="member-event-tag">${escapeHtml(m.eventTag)}</p>`
+          : "";
 
         return `
-        <article class="member-card">
+        <article class="member-card${roleInfo.isManager ? " member-card--manager" : ""}">
           <div class="member-card-top">
-            <p class="member-event-tag">${escapeHtml(m.eventTag)}</p>
+            <div class="member-card-tags">
+              <span class="member-role-badge ${roleInfo.isManager ? "member-role-badge--manager" : "member-role-badge--athlete"}">${escapeHtml(roleInfo.label)}</span>
+              ${eventTagHtml}
+            </div>
             <p class="member-num">${escapeHtml(m.num)}</p>
           </div>
           <p class="member-kana">${escapeHtml(m.kana)}</p>
@@ -524,12 +557,7 @@ document.addEventListener("DOMContentLoaded", () => {
           <div class="member-details">
             <p>出身高校   ${escapeHtml(m.highSchool)}</p>
           </div>
-          <div class="member-pb-box">
-            <p class="member-pb-label">PERSONAL BEST</p>
-            <dl class="member-pb-list">
-              ${pbRowsHtml}
-            </dl>
-          </div>
+          ${pbBoxHtml}
           <p class="member-comment">${escapeHtml(m.comment)}</p>
         </article>
       `;
@@ -831,6 +859,14 @@ document.addEventListener("DOMContentLoaded", () => {
               const idxNum = String(grouped[gradeKey].length + 1).padStart(2, "0");
               const faculty = row["学部・研究科"] || row["学部"] || "";
               const displayGrade = gradeKey === "院生" ? "大学院生" : gradeKey;
+              const rawRole =
+                row["役割"] ||
+                row["選手・マネージャー"] ||
+                row["選手/マネージャー"] ||
+                row["役職"] ||
+                row["種別"] ||
+                "";
+              const roleInfo = resolveMemberRole(rawRole);
               const specialty = row["専門種目"] || row["種目"] || "";
               const headingEvent = row["見出し種目"] || "";
               const fallbackEvent = headingEvent || specialty || "";
@@ -852,13 +888,14 @@ document.addEventListener("DOMContentLoaded", () => {
                   pbList.push({ event: evCol || fallbackEvent, value: recCol || "—" });
                 }
               }
-              if (pbList.length === 0) {
+              if (pbList.length === 0 && !roleInfo.isManager) {
                 pbList.push({ event: fallbackEvent, value: "—" });
               }
 
               const pbEvents = Array.from(new Set(pbList.map((p) => p.event).filter(Boolean)));
               const resolvedEventTag =
-                headingEvent || (pbEvents.length > 0 ? pbEvents.join(" / ") : specialty) || "TRACK & FIELD";
+                headingEvent ||
+                (pbEvents.length > 0 ? pbEvents.join(" / ") : roleInfo.isManager ? "" : specialty || "TRACK & FIELD");
 
               const rawComment = row["一言"] || row["コメント"] || "";
               const formattedComment =
@@ -866,6 +903,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
               grouped[gradeKey].push({
                 num: idxNum,
+                role: roleInfo.label,
                 eventTag: resolvedEventTag,
                 kana: row["フリガナ"] || row["カナ"] || "",
                 name: row["氏名"] || row["名前"] || "",

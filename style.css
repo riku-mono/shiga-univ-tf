@@ -1718,18 +1718,53 @@ main {
   box-shadow: var(--shadow-card-hover);
 }
 
+.member-card--manager {
+  border-top-color: var(--brand-navy);
+}
+
 .member-card-top {
   width: 100%;
   display: flex;
-  align-items: flex-start;
+  align-items: center;
   justify-content: space-between;
   gap: 12px;
   color: var(--brand-blue);
   font-weight: 700;
 }
 
-.member-event-tag {
+.member-card-tags {
   flex: 1 0 0;
+  min-inline-size: 0;
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 6px 10px;
+}
+
+.member-role-badge {
+  display: inline-flex;
+  align-items: center;
+  font-family: 'Noto Sans JP', sans-serif;
+  font-weight: 700;
+  font-size: 11px;
+  line-height: 1.4;
+  padding: 2px 10px;
+  border-radius: 999px;
+  white-space: nowrap;
+}
+
+.member-role-badge--athlete {
+  background-color: var(--brand-blue);
+  color: var(--white);
+}
+
+.member-role-badge--manager {
+  background-color: var(--white);
+  color: var(--brand-navy);
+  border: 1.5px solid var(--brand-navy);
+}
+
+.member-event-tag {
   min-width: 0;
   font-family: 'Noto Sans JP', sans-serif;
   font-weight: 700;
