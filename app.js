@@ -431,6 +431,56 @@ document.addEventListener("DOMContentLoaded", () => {
   const membersGradeHeading = document.getElementById("members-grade-heading");
   const membersCardsGrid = document.getElementById("members-cards-grid");
 
+  function parseMemberPbs(rawList, fallbackEvent) {
+    const inputs = Array.isArray(rawList) ? rawList : [rawList];
+    const items = [];
+
+    inputs.forEach((raw) => {
+      if (raw && typeof raw === "object") {
+        const ev = String(raw.event || fallbackEvent || "").trim();
+        const val = String(raw.value || "").trim();
+        if (val || ev) {
+          items.push({ event: ev, value: val || "—" });
+        }
+        return;
+      }
+
+      const text = String(raw || "").trim();
+      if (!text) return;
+
+      const entries = text
+        .split(/\r?\n|[/／;；、]+|,\s*(?=\S+[\s　]+\S)/)
+        .map((s) => s.trim())
+        .filter(Boolean);
+
+      entries.forEach((entry) => {
+        const colonMatch = entry.match(/^([^:：\s　][^:：]*?)(?:\s*：\s*|:\s+)(.+)$/);
+        if (colonMatch) {
+          items.push({ event: colonMatch[1].trim(), value: colonMatch[2].trim() });
+          return;
+        }
+
+        const spaceMatch = entry.match(/^(\S+)[\s　]+(.+)$/);
+        if (spaceMatch) {
+          const left = spaceMatch[1].trim();
+          const right = spaceMatch[2].trim();
+          const leftLooksLikeTimeWithWind = /^\d+(?:秒|['′"″分:.])/.test(left) && /^\(/.test(right);
+          if (!leftLooksLikeTimeWithWind) {
+            items.push({ event: left, value: right });
+            return;
+          }
+        }
+
+        items.push({ event: String(fallbackEvent || "").trim(), value: entry });
+      });
+    });
+
+    if (items.length === 0) {
+      return [{ event: String(fallbackEvent || "").trim(), value: "—" }];
+    }
+    return items;
+  }
+
   function renderMembersForGrade(gradeKey) {
     if (!membersCardsGrid || typeof SITE_DATA === "undefined" || !SITE_DATA.membersByGrade) return;
 
@@ -445,8 +495,24 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     membersCardsGrid.innerHTML = list
-      .map(
-        (m) => `
+      .map((m) => {
+        const pbItems =
+          Array.isArray(m.pbList) && m.pbList.length > 0
+            ? m.pbList
+            : parseMemberPbs(m.pb, m.fallbackEvent || m.eventTag);
+
+        const pbRowsHtml = pbItems
+          .map(
+            (item) => `
+              <div class="member-pb-item">
+                ${item.event ? `<dt class="member-pb-event">${escapeHtml(item.event)}</dt>` : ""}
+                <dd class="member-pb-value">${escapeHtml(item.value)}</dd>
+              </div>
+            `
+          )
+          .join("");
+
+        return `
         <article class="member-card">
           <div class="member-card-top">
             <p class="member-event-tag">${escapeHtml(m.eventTag)}</p>
@@ -457,16 +523,17 @@ document.addEventListener("DOMContentLoaded", () => {
           <p class="member-faculty">${escapeHtml(m.facultyGrade)}</p>
           <div class="member-details">
             <p>出身高校   ${escapeHtml(m.highSchool)}</p>
-            <p>専門種目   ${escapeHtml(m.specialty)}</p>
           </div>
           <div class="member-pb-box">
             <p class="member-pb-label">PERSONAL BEST</p>
-            <p class="member-pb-value">${escapeHtml(m.pb)}</p>
+            <dl class="member-pb-list">
+              ${pbRowsHtml}
+            </dl>
           </div>
           <p class="member-comment">${escapeHtml(m.comment)}</p>
         </article>
-      `
-      )
+      `;
+      })
       .join("");
   }
 
@@ -765,19 +832,47 @@ document.addEventListener("DOMContentLoaded", () => {
               const faculty = row["学部・研究科"] || row["学部"] || "";
               const displayGrade = gradeKey === "院生" ? "大学院生" : gradeKey;
               const specialty = row["専門種目"] || row["種目"] || "";
+              const headingEvent = row["見出し種目"] || "";
+              const fallbackEvent = headingEvent || specialty || "";
+              const rawPbTexts = [
+                row["自己ベスト"] || row["PB"] || row["パーソナルベスト"] || ""
+              ];
+              for (let n = 2; n <= 5; n++) {
+                const extraPb =
+                  row[`自己ベスト${n}`] || row[`PB${n}`] || row[`パーソナルベスト${n}`];
+                if (extraPb) rawPbTexts.push(extraPb);
+              }
+
+              const hasTextPb = rawPbTexts.some((t) => String(t || "").trim() !== "");
+              const pbList = hasTextPb ? parseMemberPbs(rawPbTexts, fallbackEvent) : [];
+              for (let n = 1; n <= 5; n++) {
+                const evCol = String(row[`種目${n}`] || "").trim();
+                const recCol = String(row[`記録${n}`] || "").trim();
+                if (evCol || recCol) {
+                  pbList.push({ event: evCol || fallbackEvent, value: recCol || "—" });
+                }
+              }
+              if (pbList.length === 0) {
+                pbList.push({ event: fallbackEvent, value: "—" });
+              }
+
+              const pbEvents = Array.from(new Set(pbList.map((p) => p.event).filter(Boolean)));
+              const resolvedEventTag =
+                headingEvent || (pbEvents.length > 0 ? pbEvents.join(" / ") : specialty) || "TRACK & FIELD";
+
               const rawComment = row["一言"] || row["コメント"] || "";
               const formattedComment =
                 rawComment && !rawComment.startsWith("「") ? `「${rawComment}」` : rawComment;
 
               grouped[gradeKey].push({
                 num: idxNum,
-                eventTag: row["見出し種目"] || specialty || "TRACK & FIELD",
+                eventTag: resolvedEventTag,
                 kana: row["フリガナ"] || row["カナ"] || "",
                 name: row["氏名"] || row["名前"] || "",
                 facultyGrade: faculty ? `${faculty}  /  ${displayGrade}` : displayGrade,
                 highSchool: row["出身高校"] || "—",
-                specialty: specialty || "—",
-                pb: row["自己ベスト"] || row["PB"] || "—",
+                fallbackEvent,
+                pbList,
                 comment: formattedComment
               });
             });
