@@ -226,7 +226,7 @@
       <div class="footer-inner">
         <p class="footer-title-jp">滋賀大学陸上競技部</p>
         <p class="footer-title-en">SHIGA UNIVERSITY TRACK &amp; FIELD</p>
-        <p class="footer-campus">彦根キャンパス  /  大津キャンパス</p>
+        <p class="footer-campus">彦根キャンパス / 大津キャンパス</p>
         <p class="footer-copy">© SHIGA UNIVERSITY TRACK &amp; FIELD CLUB</p>
       </div>
     </footer>
@@ -237,15 +237,8 @@
   <button type="button" id="mobile-preview-btn" class="mobile-preview-fab" title="スマホ版（iPhone実画面サイズ）での見え方を確認します">
     <span aria-hidden="true">📱</span> スマホ表示で見る
   </button>
-  <dialog id="mobile-preview-modal" class="mobile-preview-modal" aria-label="スマホ表示プレビュー" closedby="any">
-    <div class="mobile-preview-toolbar">
-      <span>📱 スマホ版プレビュー（390px幅）</span>
-      <button type="button" id="mobile-preview-close" class="mobile-preview-close">✕ PC表示に戻る</button>
-    </div>
-    <div class="mobile-device-frame">
-      <iframe id="mobile-preview-iframe" title="スマホ表示プレビュー"></iframe>
-    </div>
-  </dialog>
+  <!-- 中身は app.js が iPhone 実機プレビューとして生成する -->
+  <dialog id="mobile-preview-modal" class="mobile-preview-modal" aria-label="スマホ表示プレビュー" closedby="any"></dialog>
 
   <script src="data.js"></script>
   <script src="app.js"></script>
