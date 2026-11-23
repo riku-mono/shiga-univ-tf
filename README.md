@@ -22,7 +22,7 @@
 * **フロントエンド**: HTML5 / CSS3 / Vanilla JavaScript（ビルドツール・フレームワーク不使用）
 * **ホスティング**: GitHub Pages（GitHub Actions による自動デプロイ）
 * **CMS / データ管理**: Google スプレッドシート（「ウェブに公開」CSV をブラウザ側から同期）
-* **対象 GitHub アカウント**: [`shiga-univ-tf`](https://github.com/shiga-univ-tf)
+* **対象 GitHub Organization**: [`shiga-univ-tf`](https://github.com/shiga-univ-tf)（各自の個人アカウントを招待して運用）
 
 ```text
 [ Google スプレッドシート ]
@@ -89,7 +89,7 @@ python -m http.server 8000
 
 ### 1. GitHub 上で空のリポジトリを作成する
 
-1. [`https://github.com/shiga-univ-tf`](https://github.com/shiga-univ-tf) にサインインし、**New repository** を開きます。
+1. 自身の個人 GitHub アカウントでサインインした状態で [`https://github.com/shiga-univ-tf`](https://github.com/shiga-univ-tf)（Organization）を開き、**New repository** を開きます（※共有アカウントの使い回しはせず、各自のアカウントを Organization に招待して運用します）。
 2. **Repository name** を入力します。
    * **推奨名**: `shiga-univ-tf.github.io`（公開 URL が `https://shiga-univ-tf.github.io/` になります）
    * 任意の名前（例：`website` 等）にした場合は `https://shiga-univ-tf.github.io/<リポジトリ名>/` で公開されます。本サイトは相対パス構成のため、どちらの名前でも動作します。
